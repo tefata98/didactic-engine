@@ -91,7 +91,7 @@ updated_at timestamptz
 1. Run SQL from `supabase-setup.sql` in SQL Editor
 2. Authentication → Providers → Email → disable "Confirm email"
 3. Authentication → Users → Add User:
-   - Email: `tefata@lightapp.io`
+   - Email: `tefata@gmail.com`
    - Password: `thedark`
    - Check "Auto Confirm User"
 
@@ -99,7 +99,7 @@ updated_at timestamptz
 
 ## Auth / Login
 
-- Login maps username to email: `tefata` → `tefata@lightapp.io`
+- Login maps username to email: `tefata` → `tefata@gmail.com`
 - Auto-signup: tries signIn first, falls back to signUp if user doesn't exist
 - Auth state persisted in localStorage via `NAMESPACES.identity`
 - "Continue without login" → guest mode (no sync)
@@ -157,7 +157,7 @@ updated_at timestamptz
 ## Known Issues / Pending
 
 - Supabase network is blocked in Claude Code sandbox — use Dashboard UI for SQL + user creation
-- Email domain is `@lightapp.io` (not `@light.app` — Supabase rejects `.app` TLD)
+- Email domain is `@gmail.com` (not `@light.app` — Supabase rejects `.app` TLD)
 - GitHub Pages deploy requires push to `main` (GitHub Actions workflow in `.github/workflows/deploy.yml`)
 
 ---

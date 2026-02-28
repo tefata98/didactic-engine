@@ -28,7 +28,7 @@ export default function LoginPage() {
       const supabase = getDefaultSupabase();
       if (!supabase) throw new Error('Failed to initialize Supabase');
 
-      const email = `${username.trim()}@lightapp.io`;
+      const email = `${username.trim()}@gmail.com`;
 
       // Try sign in first
       setStatus('Signing in...');
