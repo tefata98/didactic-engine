@@ -1,20 +1,17 @@
 import { useState } from 'react';
-import { Loader2, AlertCircle, Wifi, WifiOff } from 'lucide-react';
-import { getSupabase } from '../utils/supabase';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { getDefaultSupabase } from '../utils/supabase';
 import { useApp } from '../context/AppContext';
 import SyncService from '../utils/syncService';
 
 export default function LoginPage() {
-  const { state, dispatch } = useApp();
-  const { settings } = state;
+  const { dispatch } = useApp();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [supabaseUrl, setSupabaseUrl] = useState(settings.supabaseUrl || '');
-  const [supabaseKey, setSupabaseKey] = useState(settings.supabaseAnonKey || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showConfig, setShowConfig] = useState(!settings.supabaseUrl);
+  const [status, setStatus] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,36 +19,56 @@ export default function LoginPage() {
       setError('Please enter username and password');
       return;
     }
-    if (!supabaseUrl.trim() || !supabaseKey.trim()) {
-      setError('Please configure Supabase first');
-      setShowConfig(true);
-      return;
-    }
 
     setLoading(true);
     setError(null);
+    setStatus('Connecting...');
 
     try {
-      // Save Supabase config
-      dispatch({
-        type: 'UPDATE_SETTINGS',
-        payload: { supabaseUrl: supabaseUrl.trim(), supabaseAnonKey: supabaseKey.trim() },
-      });
-
-      // Initialize Supabase
-      const supabase = getSupabase(supabaseUrl.trim(), supabaseKey.trim());
+      const supabase = getDefaultSupabase();
       if (!supabase) throw new Error('Failed to initialize Supabase');
 
-      // Map username to email
       const email = `${username.trim()}@light.app`;
 
-      // Sign in
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      // Try sign in first
+      setStatus('Signing in...');
+      let { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: password.trim(),
       });
 
-      if (authError) throw authError;
+      // If user doesn't exist, try to sign up
+      if (signInError && signInError.message.includes('Invalid login credentials')) {
+        setStatus('Creating account...');
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password: password.trim(),
+          options: {
+            data: { username: username.trim(), display_name: 'Stefan' },
+          },
+        });
+
+        if (signUpError) throw signUpError;
+
+        // If email confirmation is disabled, user is immediately active
+        if (signUpData.user && !signUpData.user.email_confirmed_at && signUpData.user.identities?.length === 0) {
+          throw new Error('Email confirmation required. Check your email or disable email confirmation in Supabase Dashboard > Authentication > Providers > Email.');
+        }
+
+        data = signUpData;
+
+        // If signup succeeded but needs confirmation, try signing in
+        if (!data.session) {
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+            email,
+            password: password.trim(),
+          });
+          if (retryError) throw retryError;
+          data = retryData;
+        }
+      } else if (signInError) {
+        throw signInError;
+      }
 
       // Save auth state
       dispatch({
@@ -65,21 +82,24 @@ export default function LoginPage() {
       });
 
       // Pull remote data and merge
+      setStatus('Syncing data...');
       try {
         await SyncService.pullAll();
         dispatch({ type: 'HYDRATE' });
       } catch (syncErr) {
+        // Sync failure is not fatal — table might not exist yet
         console.warn('Initial sync failed:', syncErr.message);
       }
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
+      setStatus('');
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative" style={{ background: '#0f172a' }}>
       {/* Background orbs */}
       <div
         className="floating-orb"
@@ -111,8 +131,8 @@ export default function LoginPage() {
       <div className="glass-card w-full max-w-sm p-6">
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 mb-4">
-            <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 mb-4">
+            <AlertCircle size={16} className="text-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-red-400">{error}</p>
           </div>
         )}
@@ -153,48 +173,16 @@ export default function LoginPage() {
             }}
           >
             {loading ? (
-              <><Loader2 size={18} className="animate-spin" /> Signing in...</>
+              <><Loader2 size={18} className="animate-spin" /> {status || 'Signing in...'}</>
             ) : (
               'Sign In'
             )}
           </button>
         </form>
 
-        {/* Supabase Config */}
-        <div className="mt-5 pt-5 border-t border-white/5">
-          <button
-            onClick={() => setShowConfig(!showConfig)}
-            className="text-xs text-white/30 hover:text-white/50 transition-colors flex items-center gap-1.5"
-          >
-            <Wifi size={12} />
-            {showConfig ? 'Hide' : 'Configure'} Supabase
-          </button>
-
-          {showConfig && (
-            <div className="mt-3 space-y-3">
-              <div>
-                <label className="text-[10px] text-white/30 mb-1 block">Supabase URL</label>
-                <input
-                  type="url"
-                  value={supabaseUrl}
-                  onChange={e => setSupabaseUrl(e.target.value)}
-                  placeholder="https://xxx.supabase.co"
-                  className="glass-input text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-white/30 mb-1 block">Anon Key</label>
-                <input
-                  type="password"
-                  value={supabaseKey}
-                  onChange={e => setSupabaseKey(e.target.value)}
-                  placeholder="eyJhbGciOiJ..."
-                  className="glass-input text-xs"
-                />
-              </div>
-            </div>
-          )}
-        </div>
+        <p className="text-[10px] text-white/20 text-center mt-4">
+          New accounts are created automatically on first login
+        </p>
       </div>
 
       {/* Skip Login */}
