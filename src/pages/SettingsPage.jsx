@@ -1,0 +1,201 @@
+import { useState } from 'react';
+import {
+  Bell, Palette, Volume2, RefreshCw, Fingerprint, WifiOff,
+  Moon, Dumbbell, Mic, DollarSign, BookOpen, Download,
+  Upload, Trash2, Info, ChevronRight, Shield, Clock, AlertTriangle
+} from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import GlassCard from '../components/GlassCard';
+import Toggle from '../components/Toggle';
+import PageHeader from '../components/PageHeader';
+import StorageService from '../utils/storageService';
+
+function SettingRow({ icon: Icon, label, description, children }) {
+  return (
+    <div className="flex items-center justify-between py-3">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
+          <Icon size={18} className="text-white/60" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-white">{label}</p>
+          {description && <p className="text-xs text-white/40 mt-0.5">{description}</p>}
+        </div>
+      </div>
+      <div className="flex-shrink-0 ml-3">{children}</div>
+    </div>
+  );
+}
+
+function SettingSection({ title, children }) {
+  return (
+    <GlassCard className="mb-4">
+      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">{title}</h3>
+      <div className="divide-y divide-white/5">{children}</div>
+    </GlassCard>
+  );
+}
+
+export default function SettingsPage() {
+  const { state, dispatch } = useApp();
+  const { settings } = state;
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const updateSetting = (key, value) => {
+    dispatch({ type: 'UPDATE_SETTINGS', payload: { [key]: value } });
+  };
+
+  const handleExport = () => {
+    const data = StorageService.exportAll();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lifeos-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          StorageService.importAll(data);
+          dispatch({ type: 'HYDRATE' });
+        } catch {
+          alert('Invalid backup file');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
+  const handleClearAll = () => {
+    StorageService.clearAll();
+    dispatch({ type: 'HYDRATE' });
+    setShowClearConfirm(false);
+  };
+
+  return (
+    <div className="space-y-2 pb-4">
+      <PageHeader title="Settings" subtitle="Customize your experience" />
+
+      {/* General */}
+      <SettingSection title="General">
+        <SettingRow icon={Bell} label="Push Notifications" description="Get reminders and alerts">
+          <Toggle enabled={settings.notifications} onChange={(v) => updateSetting('notifications', v)} />
+        </SettingRow>
+        <SettingRow icon={Palette} label="Dark Mode" description="Always on">
+          <Toggle enabled={settings.darkMode} onChange={(v) => updateSetting('darkMode', v)} />
+        </SettingRow>
+        <SettingRow icon={Volume2} label="Sound Effects" description="UI sounds and alerts">
+          <Toggle enabled={settings.soundEffects} onChange={(v) => updateSetting('soundEffects', v)} />
+        </SettingRow>
+        <SettingRow icon={RefreshCw} label="Auto Sync" description="Sync data across devices">
+          <Toggle enabled={settings.autoSync} onChange={(v) => updateSetting('autoSync', v)} />
+        </SettingRow>
+      </SettingSection>
+
+      {/* Privacy */}
+      <SettingSection title="Privacy & Security">
+        <SettingRow icon={Fingerprint} label="Face ID / Fingerprint" description="Biometric authentication">
+          <Toggle enabled={settings.faceId} onChange={(v) => updateSetting('faceId', v)} />
+        </SettingRow>
+        <SettingRow icon={WifiOff} label="Offline Mode" description="Work without internet">
+          <Toggle enabled={settings.offlineMode} onChange={(v) => updateSetting('offlineMode', v)} />
+        </SettingRow>
+      </SettingSection>
+
+      {/* Reminders */}
+      <SettingSection title="Reminders">
+        <SettingRow icon={Moon} label="Sleep Wind-Down" description="Daily at 10:30 PM">
+          <Toggle
+            enabled={settings.reminders.sleepWindDown.enabled}
+            onChange={(v) => dispatch({ type: 'UPDATE_REMINDER', payload: { sleepWindDown: { ...settings.reminders.sleepWindDown, enabled: v } } })}
+          />
+        </SettingRow>
+        <SettingRow icon={Dumbbell} label="Workout" description="Mon/Wed/Fri at 7:00 AM">
+          <Toggle
+            enabled={settings.reminders.workout.enabled}
+            onChange={(v) => dispatch({ type: 'UPDATE_REMINDER', payload: { workout: { ...settings.reminders.workout, enabled: v } } })}
+          />
+        </SettingRow>
+        <SettingRow icon={Mic} label="Vocal Practice" description="Daily at 6:00 PM">
+          <Toggle
+            enabled={settings.reminders.vocalPractice.enabled}
+            onChange={(v) => dispatch({ type: 'UPDATE_REMINDER', payload: { vocalPractice: { ...settings.reminders.vocalPractice, enabled: v } } })}
+          />
+        </SettingRow>
+        <SettingRow icon={DollarSign} label="Budget Alerts" description="Spending notifications">
+          <Toggle
+            enabled={settings.reminders.budgetAlerts.enabled}
+            onChange={(v) => dispatch({ type: 'UPDATE_REMINDER', payload: { budgetAlerts: { ...settings.reminders.budgetAlerts, enabled: v } } })}
+          />
+        </SettingRow>
+        <SettingRow icon={BookOpen} label="Reading Goal" description="Daily at 9:00 PM">
+          <Toggle
+            enabled={settings.reminders.readingGoal.enabled}
+            onChange={(v) => dispatch({ type: 'UPDATE_REMINDER', payload: { readingGoal: { ...settings.reminders.readingGoal, enabled: v } } })}
+          />
+        </SettingRow>
+      </SettingSection>
+
+      {/* Install App */}
+      <button
+        className="w-full py-4 rounded-glass font-heading font-semibold text-white flex items-center justify-center gap-2 mb-4"
+        style={{
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+        }}
+        onClick={() => {
+          if (window.deferredPrompt) {
+            window.deferredPrompt.prompt();
+          }
+        }}
+      >
+        <Download size={20} />
+        Install App
+      </button>
+
+      {/* Data Management */}
+      <SettingSection title="Data Management">
+        <SettingRow icon={Download} label="Export Data" description="Download JSON backup">
+          <button onClick={handleExport} className="btn-ghost text-xs">Export</button>
+        </SettingRow>
+        <SettingRow icon={Upload} label="Import Data" description="Restore from backup">
+          <button onClick={handleImport} className="btn-ghost text-xs">Import</button>
+        </SettingRow>
+        <SettingRow icon={Trash2} label="Clear All Data" description="Delete everything">
+          {!showClearConfirm ? (
+            <button onClick={() => setShowClearConfirm(true)} className="px-3 py-1.5 rounded-xl text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors">
+              Clear
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button onClick={handleClearAll} className="px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-red-500 hover:bg-red-600 transition-colors">
+                Confirm
+              </button>
+              <button onClick={() => setShowClearConfirm(false)} className="px-3 py-1.5 rounded-xl text-xs font-medium text-white/50 bg-white/5">
+                Cancel
+              </button>
+            </div>
+          )}
+        </SettingRow>
+      </SettingSection>
+
+      {/* Version */}
+      <div className="text-center py-6">
+        <p className="text-xs text-white/30">LifeOS v2.0.0</p>
+        <p className="text-xs text-white/20 mt-1">Made with care for Stefan</p>
+      </div>
+    </div>
+  );
+}

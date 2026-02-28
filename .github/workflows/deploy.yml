@@ -33,12 +33,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Copy SW and manifest to dist
+      - name: Copy PWA assets to dist
         run: |
           cp public/sw.js dist/
           cp public/manifest.json dist/
           cp public/icon-192.png dist/
           cp public/icon-512.png dist/
+          cp public/404.html dist/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
