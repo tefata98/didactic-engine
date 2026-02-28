@@ -3,14 +3,17 @@ import {
   Bell, Palette, Volume2, RefreshCw, Fingerprint, WifiOff,
   Moon, Dumbbell, Mic, DollarSign, BookOpen, Download,
   Upload, Trash2, Info, ChevronRight, Shield, Clock, AlertTriangle, Zap,
-  Sun, Wifi
+  Sun, Wifi, LogOut, Cloud, Loader2, User
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import GlassCard from '../components/GlassCard';
 import Toggle from '../components/Toggle';
 import PageHeader from '../components/PageHeader';
 import StorageService from '../utils/storageService';
 import useSounds from '../hooks/useSounds';
+import SyncService from '../utils/syncService';
+import { getActiveSupabase } from '../utils/supabase';
 
 function SettingRow({ icon: Icon, label, description, children }) {
   return (
@@ -40,10 +43,13 @@ function SettingSection({ title, children }) {
 
 export default function SettingsPage() {
   const { state, dispatch } = useApp();
-  const { settings } = state;
+  const { settings, auth } = state;
+  const navigate = useNavigate();
   const sounds = useSounds();
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [syncing, setSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(settings.lastSyncTime || null);
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
@@ -175,6 +181,42 @@ export default function SettingsPage() {
     StorageService.clearAll();
     dispatch({ type: 'HYDRATE' });
     setShowClearConfirm(false);
+  };
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    try {
+      await SyncService.fullSync();
+      const now = Date.now();
+      setLastSyncTime(now);
+      updateSetting('lastSyncTime', now);
+      dispatch({ type: 'HYDRATE' });
+      sounds.success();
+    } catch (err) {
+      alert('Sync failed: ' + err.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const supabase = getActiveSupabase();
+    if (supabase) {
+      await supabase.auth.signOut().catch(() => {});
+    }
+    dispatch({ type: 'LOGOUT' });
+    navigate('/login');
+  };
+
+  const getLastSyncText = () => {
+    if (!lastSyncTime) return 'Never synced';
+    const diff = Date.now() - lastSyncTime;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
   };
 
   return (
@@ -322,6 +364,35 @@ export default function SettingsPage() {
               </button>
             </div>
           )}
+        </SettingRow>
+      </SettingSection>
+
+      {/* Account & Sync */}
+      <SettingSection title="Account & Sync">
+        <SettingRow icon={User} label="Logged in as" description={auth.username ? `${auth.username}${auth.email ? ` (${auth.email})` : ''}` : 'Guest'}>
+          {auth.userId && (
+            <span className="text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">Connected</span>
+          )}
+        </SettingRow>
+        {auth.userId && (
+          <SettingRow icon={Cloud} label="Manual Sync" description={`Last sync: ${getLastSyncText()}`}>
+            <button
+              onClick={handleManualSync}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 transition-colors disabled:opacity-50"
+            >
+              {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+              {syncing ? 'Syncing...' : 'Sync Now'}
+            </button>
+          </SettingRow>
+        )}
+        <SettingRow icon={LogOut} label="Log Out" description="Sign out of your account">
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 rounded-xl text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors"
+          >
+            Log Out
+          </button>
         </SettingRow>
       </SettingSection>
 

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useApp } from './context/AppContext';
 
 const Dashboard = lazy(() => import('./pages/DashboardPage'));
 const Planner = lazy(() => import('./pages/PlannerPage'));
@@ -11,6 +12,7 @@ const Sleep = lazy(() => import('./pages/SleepPage'));
 const News = lazy(() => import('./pages/NewsPage'));
 const Profile = lazy(() => import('./pages/ProfilePage'));
 const Settings = lazy(() => import('./pages/SettingsPage'));
+const Login = lazy(() => import('./pages/LoginPage'));
 
 function PageLoader() {
   return (
@@ -20,20 +22,29 @@ function PageLoader() {
   );
 }
 
+function AuthGuard({ children }) {
+  const { state } = useApp();
+  if (!state.auth.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 export default function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/planner" element={<Planner />} />
-        <Route path="/vocals" element={<Vocals />} />
-        <Route path="/fitness" element={<Fitness />} />
-        <Route path="/finance" element={<Finance />} />
-        <Route path="/reading" element={<Reading />} />
-        <Route path="/sleep" element={<Sleep />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<AuthGuard><Dashboard /></AuthGuard>} />
+        <Route path="/planner" element={<AuthGuard><Planner /></AuthGuard>} />
+        <Route path="/vocals" element={<AuthGuard><Vocals /></AuthGuard>} />
+        <Route path="/fitness" element={<AuthGuard><Fitness /></AuthGuard>} />
+        <Route path="/finance" element={<AuthGuard><Finance /></AuthGuard>} />
+        <Route path="/reading" element={<AuthGuard><Reading /></AuthGuard>} />
+        <Route path="/sleep" element={<AuthGuard><Sleep /></AuthGuard>} />
+        <Route path="/news" element={<AuthGuard><News /></AuthGuard>} />
+        <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
+        <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
