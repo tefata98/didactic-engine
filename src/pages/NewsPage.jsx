@@ -1,18 +1,17 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Bookmark, Share2, ExternalLink, Clock,
-  Filter, TrendingUp, ChevronRight, ChevronLeft, Tag, Search, Newspaper,
-  RefreshCw, X, Loader2, AlertCircle, Zap, BookOpen
+  TrendingUp, ChevronLeft, Tag, Search, Newspaper,
+  RefreshCw, X, Loader2, AlertCircle, BookOpen
 } from 'lucide-react';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/PageHeader';
 import Badge from '../components/Badge';
 import EmptyState from '../components/EmptyState';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { useApp } from '../context/AppContext';
 import { NAMESPACES, COLORS } from '../utils/constants';
 import { getRelativeTime } from '../utils/dateHelpers';
-import { generateNews } from '../utils/anthropicService';
+import { fetchAllNews } from '../utils/newsService';
 
 const CATEGORY_COLORS = {
   All: COLORS.primary,
@@ -234,7 +233,7 @@ function ArticleDetail({ article, isBookmarked, onToggleBookmark, onShare, onClo
             </p>
           </div>
 
-          {/* Full Content */}
+          {/* Full Content or Read More Link */}
           {article.content ? (
             <div className="prose prose-invert max-w-none">
               {article.content.split('\n\n').map((paragraph, i) => (
@@ -243,12 +242,18 @@ function ArticleDetail({ article, isBookmarked, onToggleBookmark, onShare, onClo
                 </p>
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-white/50 italic">
-              Full article content not available. This article was generated before full content support was added.
-              Refresh your news feed to get full articles.
-            </p>
-          )}
+          ) : article.url && article.url !== '#' ? (
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+            >
+              <ExternalLink size={16} />
+              Read Full Article
+            </a>
+          ) : null}
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-white/5">
@@ -273,10 +278,6 @@ function ArticleDetail({ article, isBookmarked, onToggleBookmark, onShare, onClo
 }
 
 export default function NewsPage() {
-  const { state } = useApp();
-  const { settings } = state;
-  const apiKey = settings.anthropicApiKey;
-
   const [articles, setArticles] = useLocalStorage(NAMESPACES.news, 'articles', []);
   const [lastFetch, setLastFetch] = useLocalStorage(NAMESPACES.news, 'lastFetch', 0);
   const [bookmarks, setBookmarks] = useLocalStorage(NAMESPACES.news, 'bookmarks', []);
@@ -287,11 +288,10 @@ export default function NewsPage() {
   const [error, setError] = useState(null);
 
   const fetchArticles = useCallback(async () => {
-    if (!apiKey) return;
     setLoading(true);
     setError(null);
     try {
-      const newArticles = await generateNews(apiKey);
+      const newArticles = await fetchAllNews();
       setArticles(newArticles);
       setLastFetch(Date.now());
     } catch (err) {
@@ -299,11 +299,11 @@ export default function NewsPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiKey, setArticles, setLastFetch]);
+  }, [setArticles, setLastFetch]);
 
   // Auto-fetch on mount if stale (1 hour)
   useEffect(() => {
-    if (apiKey && (articles.length === 0 || Date.now() - lastFetch > ONE_HOUR)) {
+    if (articles.length === 0 || Date.now() - lastFetch > ONE_HOUR) {
       fetchArticles();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -402,18 +402,14 @@ export default function NewsPage() {
         title="News Feed"
         subtitle="Curated articles for your interests"
         rightElement={
-          <div className="flex items-center gap-3">
-            {apiKey && (
-              <button
-                onClick={fetchArticles}
-                disabled={loading}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/20 transition-all disabled:opacity-50"
-              >
-                <RefreshCw size={14} className={`text-indigo-400 ${loading ? 'animate-spin' : ''}`} />
-                <span className="text-xs font-medium text-indigo-400">Refresh</span>
-              </button>
-            )}
-          </div>
+          <button
+            onClick={fetchArticles}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/20 transition-all disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={`text-indigo-400 ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-xs font-medium text-indigo-400">Refresh</span>
+          </button>
         }
       />
 
@@ -429,17 +425,6 @@ export default function NewsPage() {
             {bookmarkCount} saved
           </span>
         </div>
-      )}
-
-      {/* No API Key Message */}
-      {!apiKey && (
-        <GlassCard className="text-center py-8">
-          <Zap size={32} className="text-indigo-400 mx-auto mb-3" />
-          <h3 className="text-white font-heading font-semibold mb-2">AI-Powered News</h3>
-          <p className="text-sm text-white/50 max-w-sm mx-auto">
-            Add your Anthropic API key in Settings &rarr; Integrations to get personalized AI-curated news
-          </p>
-        </GlassCard>
       )}
 
       {/* Error */}

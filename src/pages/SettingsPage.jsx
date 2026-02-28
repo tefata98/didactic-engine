@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Bell, Volume2, RefreshCw, Fingerprint, WifiOff,
   Moon, Dumbbell, Mic, DollarSign, BookOpen, Download,
-  Upload, Trash2, Zap, Sun, Wifi
+  Upload, Trash2, Sun, Wifi
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import GlassCard from '../components/GlassCard';
@@ -263,22 +263,6 @@ export default function SettingsPage() {
             enabled={settings.reminders.readingGoal.enabled}
             onChange={(v) => { dispatch({ type: 'UPDATE_REMINDER', payload: { readingGoal: { ...settings.reminders.readingGoal, enabled: v } } }); sounds.toggle(v); }}
           />
-        </SettingRow>
-      </SettingSection>
-
-      {/* AI Integration */}
-      <SettingSection title="AI Integration">
-        <SettingRow icon={Zap} label="Anthropic API Key" description={settings.anthropicApiKey ? 'Key is set' : 'Required for AI news'}>
-          <div className="flex items-center gap-2">
-            <input
-              type="password"
-              value={settings.anthropicApiKey || ''}
-              onChange={(e) => updateSetting('anthropicApiKey', e.target.value)}
-              placeholder="sk-ant-..."
-              className="w-36 px-2 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 outline-none focus:border-indigo-500/50"
-              style={{ color: 'var(--text-primary)' }}
-            />
-          </div>
         </SettingRow>
       </SettingSection>
 
