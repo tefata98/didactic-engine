@@ -5,8 +5,8 @@ import { LayoutDashboard, Calendar, Mic, Dumbbell, MoreHorizontal, DollarSign, B
 const mainTabs = [
   { path: '/', icon: LayoutDashboard, label: 'Home' },
   { path: '/planner', icon: Calendar, label: 'Planner' },
-  { path: '/fitness', icon: Dumbbell, label: 'Fitness' },
   { path: '/vocals', icon: Mic, label: 'Vocals' },
+  { path: '/fitness', icon: Dumbbell, label: 'Fitness' },
   { path: '/more', icon: MoreHorizontal, label: 'More', isMore: true },
 ];
 

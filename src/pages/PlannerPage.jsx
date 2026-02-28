@@ -326,9 +326,9 @@ function AddTaskModal({ onAdd, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center overflow-y-auto" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-4 md:mb-0 animate-slideUp" onClick={e => e.stopPropagation()}>
+      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-24 md:mb-0 max-h-[85vh] overflow-y-auto animate-slideUp" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-heading font-semibold text-white text-lg">Add Task</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">

@@ -10,6 +10,11 @@ export default function AppShell({ children }) {
   const { state } = useApp();
   const { scheduleReminders } = useNotifications();
 
+  // Scroll to top on page/tab change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (state.settings.notifications) {
       scheduleReminders(state.settings.reminders);
@@ -50,10 +55,7 @@ export default function AppShell({ children }) {
       <Sidebar />
 
       {/* Main Content */}
-      <main
-        className="relative z-10 md:ml-64 pb-32 md:pb-8 min-h-screen safe-top"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-      >
+      <main className="relative z-10 md:ml-64 pb-32 md:pb-8 min-h-screen">
         <div key={location.pathname} className="page-enter px-5 pt-6 md:px-8 md:pt-8 max-w-3xl mx-auto">
           {children}
         </div>

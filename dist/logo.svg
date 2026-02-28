@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0d0d1a"/>
+    </radialGradient>
+
+    <!-- Warm glow behind lotus -->
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#d4a44a" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#b8860b" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0d0d1a" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Petal gradient (golden) -->
+    <linearGradient id="petalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0d060"/>
+      <stop offset="40%" stop-color="#d4a030"/>
+      <stop offset="100%" stop-color="#a07020"/>
+    </linearGradient>
+
+    <!-- Inner petal gradient (brighter gold) -->
+    <linearGradient id="innerPetalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe080"/>
+      <stop offset="50%" stop-color="#e0b840"/>
+      <stop offset="100%" stop-color="#c09030"/>
+    </linearGradient>
+
+    <!-- Star gradient -->
+    <radialGradient id="starGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8e0"/>
+      <stop offset="60%" stop-color="#f0d060"/>
+      <stop offset="100%" stop-color="#d4a030"/>
+    </radialGradient>
+
+    <!-- Center glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbe0" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#f0d060" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark background -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+
+  <!-- Warm glow -->
+  <circle cx="256" cy="256" r="252.92800000000003" fill="url(#glowGrad)"/>
+
+  <!-- Lotus petals -->
+  <ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(0, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(45, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(90, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(135, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(180, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(225, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(270, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="163.584" rx="54.476800000000004" ry="101.6576"
+      transform="rotate(315, 256, 256)"
+      fill="url(#petalGrad)" opacity="0.85"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(22.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(67.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(112.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(157.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(202.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(247.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(292.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/><ellipse cx="256" cy="199.0912" rx="42.803200000000004" ry="63.232000000000006"
+      transform="rotate(337.5, 256, 256)"
+      fill="url(#innerPetalGrad)" opacity="0.9"/>
+
+  <!-- Center star -->
+  <path d="M256,197.632 L270.4453430115037,241.55465698849628 L314.368,256 L270.4453430115037,270.4453430115037 L256,314.368 L241.55465698849628,270.4453430115037 L197.632,256 L241.55465698849625,241.55465698849628 Z" fill="url(#starGrad)"/>
+
+  <!-- Center bright dot -->
+  <circle cx="256" cy="256" r="15.5648" fill="url(#centerGlow)"/>
+</svg>
