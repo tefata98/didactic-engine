@@ -45,59 +45,18 @@ const TABS = [
 ];
 
 function getDefaultFinanceData() {
-  const now = new Date();
-  const currentMonth = getMonthKey(now);
-  const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 15);
-  const prevMonth = getMonthKey(prevDate);
-
   return {
-    income: {
-      [currentMonth]: 3200,
-      [prevMonth]: 3200,
-    },
-    expenses: [
-      { id: '1', amount: 850, category: 'Rent', note: 'Monthly apartment rent', date: `${currentMonth}-01`, month: currentMonth },
-      { id: '2', amount: 120, category: 'Utilities', note: 'Electricity and water', date: `${currentMonth}-03`, month: currentMonth },
-      { id: '3', amount: 45, category: 'Subscriptions', note: 'Spotify, iCloud, gym', date: `${currentMonth}-05`, month: currentMonth },
-      { id: '4', amount: 380, category: 'Food', note: 'Groceries and dining', date: `${currentMonth}-08`, month: currentMonth },
-      { id: '5', amount: 60, category: 'Transport', note: 'Metro card + fuel', date: `${currentMonth}-10`, month: currentMonth },
-      { id: '6', amount: 150, category: 'Going Out', note: 'Concerts and bars', date: `${currentMonth}-12`, month: currentMonth },
-      { id: '7', amount: 200, category: 'Music Gear', note: 'New microphone cable', date: `${currentMonth}-15`, month: currentMonth },
-      { id: '8', amount: 500, category: 'Savings', note: 'Emergency fund deposit', date: `${currentMonth}-01`, month: currentMonth },
-      { id: '9', amount: 200, category: 'Investment', note: 'ETF monthly buy', date: `${currentMonth}-01`, month: currentMonth },
-      { id: '10', amount: 780, category: 'Rent', note: 'Monthly apartment rent', date: `${prevMonth}-01`, month: prevMonth },
-      { id: '11', amount: 110, category: 'Utilities', note: 'Electricity and water', date: `${prevMonth}-03`, month: prevMonth },
-      { id: '12', amount: 45, category: 'Subscriptions', note: 'Spotify, iCloud, gym', date: `${prevMonth}-05`, month: prevMonth },
-      { id: '13', amount: 350, category: 'Food', note: 'Groceries and dining', date: `${prevMonth}-08`, month: prevMonth },
-      { id: '14', amount: 55, category: 'Transport', note: 'Metro card', date: `${prevMonth}-10`, month: prevMonth },
-      { id: '15', amount: 120, category: 'Going Out', note: 'Friday night out', date: `${prevMonth}-12`, month: prevMonth },
-      { id: '16', amount: 500, category: 'Savings', note: 'Emergency fund deposit', date: `${prevMonth}-01`, month: prevMonth },
-      { id: '17', amount: 200, category: 'Investment', note: 'ETF monthly buy', date: `${prevMonth}-01`, month: prevMonth },
-    ],
+    income: {},
+    expenses: [],
     savingsGoals: [
-      { id: 'emergency', name: 'Emergency Fund', target: 11520, current: 4800, color: '#ef4444', icon: 'shield' },
-      { id: 'saas', name: 'SaaS Side Project Fund', target: 3000, current: 850, color: '#6366f1', icon: 'code' },
-      { id: 'music', name: 'Music Investment Fund', target: 2000, current: 1200, color: '#ec4899', icon: 'music' },
-      { id: 'skill', name: 'Skill Development Fund', target: 1500, current: 600, color: '#f59e0b', icon: 'book' },
+      { id: 'emergency', name: 'Emergency Fund', target: 11520, current: 0, color: '#ef4444', icon: 'shield' },
+      { id: 'saas', name: 'SaaS Side Project Fund', target: 3000, current: 0, color: '#6366f1', icon: 'code' },
+      { id: 'music', name: 'Music Investment Fund', target: 2000, current: 0, color: '#ec4899', icon: 'music' },
+      { id: 'skill', name: 'Skill Development Fund', target: 1500, current: 0, color: '#f59e0b', icon: 'book' },
     ],
-    netWorthHistory: [
-      { month: 'Sep', assets: 12000, debts: 2000, net: 10000 },
-      { month: 'Oct', assets: 13200, debts: 1800, net: 11400 },
-      { month: 'Nov', assets: 14500, debts: 1600, net: 12900 },
-      { month: 'Dec', assets: 15100, debts: 1400, net: 13700 },
-      { month: 'Jan', assets: 16200, debts: 1200, net: 15000 },
-      { month: 'Feb', assets: 17450, debts: 1000, net: 16450 },
-    ],
-    assets: {
-      'Bank Accounts': 8200,
-      'Investment Portfolio': 5400,
-      'Savings Goals': 7450,
-      'Cash': 400,
-    },
-    debts: {
-      'Credit Card': 600,
-      'Personal Loan': 400,
-    },
+    netWorthHistory: [],
+    assets: {},
+    debts: {},
   };
 }
 
@@ -107,7 +66,7 @@ function ChartTooltipContent({ active, payload }) {
     <div className="glass-card-sm px-3 py-2 text-xs">
       {payload.map((entry, i) => (
         <p key={i} style={{ color: entry.color || '#fff' }} className="font-medium">
-          {entry.name}: {entry.value.toLocaleString()} лв
+          {entry.name}: {entry.value.toLocaleString()} €
         </p>
       ))}
     </div>
@@ -119,13 +78,28 @@ function PieTooltipContent({ active, payload }) {
   return (
     <div className="glass-card-sm px-3 py-2 text-xs">
       <p className="text-white font-medium">{payload[0].name}</p>
-      <p style={{ color: payload[0].payload.fill }}>{payload[0].value.toLocaleString()} лв</p>
+      <p style={{ color: payload[0].payload.fill }}>{payload[0].value.toLocaleString()} €</p>
     </div>
   );
 }
 
-function OverviewTab({ financeData, currentMonth }) {
+function OverviewTab({ financeData, setFinanceData, currentMonth }) {
+  const [showIncomeInput, setShowIncomeInput] = useState(false);
+  const [incomeInput, setIncomeInput] = useState('');
+
   const monthlyIncome = financeData.income[currentMonth] || 0;
+
+  const handleSetIncome = (e) => {
+    e.preventDefault();
+    const amount = parseFloat(incomeInput);
+    if (isNaN(amount) || amount < 0) return;
+    setFinanceData(prev => ({
+      ...prev,
+      income: { ...prev.income, [currentMonth]: amount }
+    }));
+    setShowIncomeInput(false);
+    setIncomeInput('');
+  };
 
   const monthlyExpenses = useMemo(() => {
     return (financeData.expenses || [])
@@ -173,9 +147,9 @@ function OverviewTab({ financeData, currentMonth }) {
       .reduce((sum, e) => sum + e.amount, 0);
   }, [financeData.expenses, currentMonth]);
 
-  const needsBudget = monthlyIncome * 0.5;
-  const wantsBudget = monthlyIncome * 0.3;
-  const savingsBudget = monthlyIncome * 0.2;
+  const needsBudget = monthlyIncome > 0 ? monthlyIncome * 0.5 : 0;
+  const wantsBudget = monthlyIncome > 0 ? monthlyIncome * 0.3 : 0;
+  const savingsBudget = monthlyIncome > 0 ? monthlyIncome * 0.2 : 0;
 
   const donutData = [
     { name: 'Expenses', value: monthlyExpenses, fill: '#ef4444' },
@@ -184,25 +158,65 @@ function OverviewTab({ financeData, currentMonth }) {
 
   return (
     <div className="space-y-4">
+      {/* Monthly Income */}
+      <GlassCard>
+        <div className="flex items-center justify-between">
+          <h3 className="font-heading font-semibold text-white flex items-center gap-2">
+            <Banknote size={18} style={{ color: ACCENT }} />
+            Monthly Income
+          </h3>
+          {!showIncomeInput ? (
+            <button onClick={() => setShowIncomeInput(true)} className="text-xs" style={{ color: ACCENT }}>
+              {monthlyIncome > 0 ? 'Edit' : 'Set Income'}
+            </button>
+          ) : null}
+        </div>
+        {showIncomeInput ? (
+          <form onSubmit={handleSetIncome} className="flex gap-2 mt-3">
+            <input type="number" value={incomeInput} onChange={e => setIncomeInput(e.target.value)} className="glass-input text-sm flex-1" placeholder="Monthly income in \u20ac" min="0" step="0.01" />
+            <button type="submit" className="btn-primary text-sm px-4">Save</button>
+          </form>
+        ) : monthlyIncome > 0 ? (
+          <p className="text-2xl font-heading font-bold text-white mt-2">{monthlyIncome.toLocaleString()} \u20ac</p>
+        ) : (
+          <p className="text-sm text-white/40 mt-2">Set your monthly income to track budget</p>
+        )}
+      </GlassCard>
+
+      {/* Overspending Alert */}
+      {monthlyIncome > 0 && monthlyExpenses > monthlyIncome && (
+        <GlassCard className="border border-red-500/30" style={{ background: 'rgba(239,68,68,0.08)' }}>
+          <div className="flex items-center gap-3">
+            <TrendingDown size={20} className="text-red-400 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-red-400">Overspending Alert</p>
+              <p className="text-xs text-red-300/70 mt-0.5">
+                You've spent {(monthlyExpenses - monthlyIncome).toLocaleString()} \u20ac more than your income this month.
+              </p>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       <div className="grid grid-cols-3 gap-3">
         <GlassCard padding="p-4" className="text-center">
           <ArrowUpRight size={18} className="text-green-400 mx-auto mb-2" />
           <div className="text-lg font-heading font-bold text-green-400">
-            <AnimatedNumber value={monthlyIncome} suffix=" лв" />
+            <AnimatedNumber value={monthlyIncome} suffix=" \u20ac" />
           </div>
           <p className="text-xs text-white/40 mt-1">Income</p>
         </GlassCard>
         <GlassCard padding="p-4" className="text-center">
           <ArrowDownRight size={18} className="text-red-400 mx-auto mb-2" />
           <div className="text-lg font-heading font-bold text-red-400">
-            <AnimatedNumber value={monthlyExpenses} suffix=" лв" />
+            <AnimatedNumber value={monthlyExpenses} suffix=" \u20ac" />
           </div>
           <p className="text-xs text-white/40 mt-1">Expenses</p>
         </GlassCard>
         <GlassCard padding="p-4" className="text-center">
           <Banknote size={18} className={`${net >= 0 ? 'text-green-400' : 'text-red-400'} mx-auto mb-2`} />
           <div className={`text-lg font-heading font-bold ${net >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            <AnimatedNumber value={Math.abs(net)} prefix={net >= 0 ? '+' : '-'} suffix=" лв" />
+            <AnimatedNumber value={Math.abs(net)} prefix={net >= 0 ? '+' : '-'} suffix=" \u20ac" />
           </div>
           <p className="text-xs text-white/40 mt-1">Net</p>
         </GlassCard>
@@ -253,76 +267,80 @@ function OverviewTab({ financeData, currentMonth }) {
         <h3 className="font-heading font-semibold text-white mb-1">50/30/20 Rule Tracker</h3>
         <p className="text-xs text-white/40 mb-4">Budget allocation based on your income</p>
 
-        <div className="space-y-5">
-          <div>
-            <div className="flex justify-between items-baseline mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">Needs</span>
-                <Badge color="#ef4444" size="sm">50%</Badge>
+        {monthlyIncome === 0 ? (
+          <p className="text-sm text-white/40 text-center py-4">Set your monthly income above to see budget allocation</p>
+        ) : (
+          <div className="space-y-5">
+            <div>
+              <div className="flex justify-between items-baseline mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white">Needs</span>
+                  <Badge color="#ef4444" size="sm">50%</Badge>
+                </div>
+                <span className="text-xs text-white/50">
+                  {needsActual.toLocaleString()} / {needsBudget.toLocaleString()} \u20ac
+                </span>
               </div>
-              <span className="text-xs text-white/50">
-                {needsActual.toLocaleString()} / {needsBudget.toLocaleString()} лв
-              </span>
+              <ProgressBar
+                value={needsActual}
+                max={needsBudget || 1}
+                color={needsBudget > 0 && needsActual > needsBudget ? '#ef4444' : '#22c55e'}
+                height={8}
+              />
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {needsCategories.map((c) => (
+                  <span key={c} className="text-[10px] text-white/30">{c}</span>
+                ))}
+              </div>
             </div>
-            <ProgressBar
-              value={needsActual}
-              max={needsBudget}
-              color={needsActual > needsBudget ? '#ef4444' : '#22c55e'}
-              height={8}
-            />
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {needsCategories.map((c) => (
-                <span key={c} className="text-[10px] text-white/30">{c}</span>
-              ))}
-            </div>
-          </div>
 
-          <div>
-            <div className="flex justify-between items-baseline mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">Wants</span>
-                <Badge color="#f59e0b" size="sm">30%</Badge>
+            <div>
+              <div className="flex justify-between items-baseline mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white">Wants</span>
+                  <Badge color="#f59e0b" size="sm">30%</Badge>
+                </div>
+                <span className="text-xs text-white/50">
+                  {wantsActual.toLocaleString()} / {wantsBudget.toLocaleString()} \u20ac
+                </span>
               </div>
-              <span className="text-xs text-white/50">
-                {wantsActual.toLocaleString()} / {wantsBudget.toLocaleString()} лв
-              </span>
+              <ProgressBar
+                value={wantsActual}
+                max={wantsBudget || 1}
+                color={wantsBudget > 0 && wantsActual > wantsBudget ? '#ef4444' : '#f59e0b'}
+                height={8}
+              />
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {wantsCategories.map((c) => (
+                  <span key={c} className="text-[10px] text-white/30">{c}</span>
+                ))}
+              </div>
             </div>
-            <ProgressBar
-              value={wantsActual}
-              max={wantsBudget}
-              color={wantsActual > wantsBudget ? '#ef4444' : '#f59e0b'}
-              height={8}
-            />
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {wantsCategories.map((c) => (
-                <span key={c} className="text-[10px] text-white/30">{c}</span>
-              ))}
-            </div>
-          </div>
 
-          <div>
-            <div className="flex justify-between items-baseline mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">Savings</span>
-                <Badge color="#22c55e" size="sm">20%</Badge>
+            <div>
+              <div className="flex justify-between items-baseline mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white">Savings</span>
+                  <Badge color="#22c55e" size="sm">20%</Badge>
+                </div>
+                <span className="text-xs text-white/50">
+                  {savingsActual.toLocaleString()} / {savingsBudget.toLocaleString()} \u20ac
+                </span>
               </div>
-              <span className="text-xs text-white/50">
-                {savingsActual.toLocaleString()} / {savingsBudget.toLocaleString()} лв
-              </span>
-            </div>
-            <ProgressBar
-              value={savingsActual}
-              max={savingsBudget}
-              color={savingsActual >= savingsBudget ? '#22c55e' : '#6366f1'}
-              height={8}
-            />
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {savingsCategories.map((c) => (
-                <span key={c} className="text-[10px] text-white/30">{c}</span>
-              ))}
+              <ProgressBar
+                value={savingsActual}
+                max={savingsBudget || 1}
+                color={savingsBudget > 0 && savingsActual >= savingsBudget ? '#22c55e' : '#6366f1'}
+                height={8}
+              />
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {savingsCategories.map((c) => (
+                  <span key={c} className="text-[10px] text-white/30">{c}</span>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </GlassCard>
 
       {expensesByCategory.length > 0 && (
@@ -333,7 +351,7 @@ function OverviewTab({ financeData, currentMonth }) {
               <div key={cat.name} className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: cat.fill }} />
                 <span className="text-sm text-white/70 flex-1">{cat.name}</span>
-                <span className="text-sm text-white font-medium">{cat.value.toLocaleString()} лв</span>
+                <span className="text-sm text-white font-medium">{cat.value.toLocaleString()} \u20ac</span>
                 <span className="text-xs text-white/30 w-10 text-right">
                   {monthlyExpenses > 0 ? Math.round((cat.value / monthlyExpenses) * 100) : 0}%
                 </span>
@@ -441,13 +459,13 @@ function ExpensesTab({ financeData, setFinanceData, currentMonth }) {
           <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
             <p className="text-xs text-white/40 mb-1">This Month</p>
             <p className="text-lg font-heading font-bold text-white">
-              {currentMonthTotal.toLocaleString()} лв
+              {currentMonthTotal.toLocaleString()} €
             </p>
           </div>
           <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
             <p className="text-xs text-white/40 mb-1">Last Month</p>
             <p className="text-lg font-heading font-bold text-white/60">
-              {prevMonthTotal.toLocaleString()} лв
+              {prevMonthTotal.toLocaleString()} €
             </p>
           </div>
         </div>
@@ -471,7 +489,7 @@ function ExpensesTab({ financeData, setFinanceData, currentMonth }) {
           </div>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-white/40 mb-1 block">Amount (лв)</label>
+              <label className="text-xs text-white/40 mb-1 block">Amount (€)</label>
               <input
                 type="number"
                 step="0.01"
@@ -607,7 +625,7 @@ function ExpensesTab({ financeData, setFinanceData, currentMonth }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-heading font-bold text-white">
-                    {expense.amount.toLocaleString()} лв
+                    {expense.amount.toLocaleString()} €
                   </span>
                   <button
                     onClick={() => handleDeleteExpense(expense.id)}
@@ -643,7 +661,7 @@ function SavingsTab({ financeData, setFinanceData, currentMonth }) {
     .reduce((sum, e) => sum + e.amount, 0);
   const savingsRate = monthlyIncome > 0 ? Math.round((monthlySaved / monthlyIncome) * 100) : 0;
 
-  const savingsRateHistory = [18, 20, 22, 19, 24, savingsRate];
+  const savingsRateHistory = [savingsRate];
 
   const handleAddFunds = (goalId) => {
     const amount = parseFloat(addAmount);
@@ -685,7 +703,7 @@ function SavingsTab({ financeData, setFinanceData, currentMonth }) {
         </div>
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="text-sm text-white/50">This month:</span>
-          <span className="text-sm font-medium text-white">{monthlySaved.toLocaleString()} лв saved</span>
+          <span className="text-sm font-medium text-white">{monthlySaved.toLocaleString()} € saved</span>
         </div>
         <div className="flex justify-center">
           <Sparkline data={savingsRateHistory} color={ACCENT} width={120} height={32} />
@@ -697,12 +715,12 @@ function SavingsTab({ financeData, setFinanceData, currentMonth }) {
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-heading font-semibold text-white">Total Saved</h3>
           <span className="text-lg font-heading font-bold text-green-400">
-            <AnimatedNumber value={totalSaved} suffix=" лв" />
+            <AnimatedNumber value={totalSaved} suffix=" €" />
           </span>
         </div>
-        <ProgressBar value={totalSaved} max={totalTarget} color={ACCENT} height={6} />
+        <ProgressBar value={totalSaved} max={totalTarget || 1} color={ACCENT} height={6} />
         <p className="text-xs text-white/40 mt-1.5">
-          {totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0}% of all goals ({totalTarget.toLocaleString()} лв)
+          {totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0}% of all goals ({totalTarget.toLocaleString()} €)
         </p>
       </GlassCard>
 
@@ -734,7 +752,7 @@ function SavingsTab({ financeData, setFinanceData, currentMonth }) {
                     />
                   </div>
                   <p className="text-xs text-white/40 mt-0.5">
-                    {goal.current.toLocaleString()} / {goal.target.toLocaleString()} лв
+                    {goal.current.toLocaleString()} / {goal.target.toLocaleString()} €
                   </p>
                 </div>
               </div>
@@ -747,7 +765,7 @@ function SavingsTab({ financeData, setFinanceData, currentMonth }) {
                     type="number"
                     value={addAmount}
                     onChange={(e) => setAddAmount(e.target.value)}
-                    placeholder="Amount in лв"
+                    placeholder="Amount in €"
                     className="glass-input flex-1 text-sm py-2 px-3"
                     autoFocus
                   />
@@ -840,7 +858,7 @@ function NetWorthTab({ financeData, setFinanceData }) {
       <GlassCard className="text-center">
         <p className="text-xs text-white/40 mb-2">Net Worth</p>
         <div className={`text-3xl font-heading font-bold ${netWorth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-          <AnimatedNumber value={netWorth} suffix=" лв" />
+          <AnimatedNumber value={netWorth} suffix=" €" />
         </div>
         <div className="flex items-center justify-center gap-1.5 mt-2">
           {netChange >= 0 ? (
@@ -849,7 +867,7 @@ function NetWorthTab({ financeData, setFinanceData }) {
             <TrendingDown size={14} className="text-red-400" />
           )}
           <span className={`text-xs font-medium ${netChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {netChange >= 0 ? '+' : ''}{netChange.toLocaleString()} лв ({netChangePercent}%)
+            {netChange >= 0 ? '+' : ''}{netChange.toLocaleString()} € ({netChangePercent}%)
           </span>
           <span className="text-xs text-white/30">vs last month</span>
         </div>
@@ -895,14 +913,14 @@ function NetWorthTab({ financeData, setFinanceData }) {
         <GlassCard padding="p-4" className="text-center">
           <ArrowUpRight size={18} className="text-green-400 mx-auto mb-2" />
           <div className="text-lg font-heading font-bold text-green-400">
-            <AnimatedNumber value={totalAssets} suffix=" лв" />
+            <AnimatedNumber value={totalAssets} suffix=" €" />
           </div>
           <p className="text-xs text-white/40 mt-1">Total Assets</p>
         </GlassCard>
         <GlassCard padding="p-4" className="text-center">
           <ArrowDownRight size={18} className="text-red-400 mx-auto mb-2" />
           <div className="text-lg font-heading font-bold text-red-400">
-            <AnimatedNumber value={totalDebts} suffix=" лв" />
+            <AnimatedNumber value={totalDebts} suffix=" €" />
           </div>
           <p className="text-xs text-white/40 mt-1">Total Debts</p>
         </GlassCard>
@@ -953,7 +971,7 @@ function NetWorthTab({ financeData, setFinanceData }) {
                 <span className="text-sm text-white/70">{name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-white font-medium">{value.toLocaleString()} лв</span>
+                <span className="text-sm text-white font-medium">{value.toLocaleString()} €</span>
                 <button onClick={() => handleDeleteAsset(name)} className="text-white/10 hover:text-red-400 p-0.5">
                   <Trash2 size={12} />
                 </button>
@@ -1013,7 +1031,7 @@ function NetWorthTab({ financeData, setFinanceData }) {
                   <span className="text-sm text-white/70">{name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-white font-medium">{value.toLocaleString()} лв</span>
+                  <span className="text-sm text-white font-medium">{value.toLocaleString()} €</span>
                   <button onClick={() => handleDeleteDebt(name)} className="text-white/10 hover:text-red-400 p-0.5">
                     <Trash2 size={12} />
                   </button>
@@ -1047,7 +1065,7 @@ export default function FinancePage() {
     <div className="space-y-6 pb-4">
       <PageHeader
         title="Finance"
-        subtitle={`Net this month: ${net >= 0 ? '+' : ''}${net.toLocaleString()} лв`}
+        subtitle={`Net this month: ${net >= 0 ? '+' : ''}${net.toLocaleString()} €`}
         rightElement={
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${ACCENT}20` }}>
@@ -1060,7 +1078,7 @@ export default function FinancePage() {
       <TabBar tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'overview' && (
-        <OverviewTab financeData={financeData} currentMonth={currentMonth} />
+        <OverviewTab financeData={financeData} setFinanceData={setFinanceData} currentMonth={currentMonth} />
       )}
 
       {activeTab === 'expenses' && (

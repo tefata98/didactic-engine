@@ -5,7 +5,7 @@ import { LayoutDashboard, Calendar, Mic, Dumbbell, MoreHorizontal, DollarSign, B
 const mainTabs = [
   { path: '/', icon: LayoutDashboard, label: 'Home' },
   { path: '/planner', icon: Calendar, label: 'Planner' },
-  { path: '/vocals', icon: Mic, label: 'Vocals', center: true },
+  { path: '/vocals', icon: Mic, label: 'Vocals' },
   { path: '/fitness', icon: Dumbbell, label: 'Fitness' },
   { path: '/more', icon: MoreHorizontal, label: 'More', isMore: true },
 ];
@@ -84,10 +84,10 @@ export default function BottomNav() {
                     active ? 'text-white' : 'text-white/40'
                   }`}
                 >
-                  <div className={`relative ${tab.center ? 'p-2.5' : 'p-1.5'} rounded-xl transition-all ${
+                  <div className={`relative p-1.5 rounded-xl transition-all ${
                     active ? 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20' : ''
-                  } ${tab.center ? 'bg-gradient-to-br from-indigo-500/10 to-violet-500/10 -mt-4 shadow-lg shadow-indigo-500/10' : ''}`}>
-                    <tab.icon size={tab.center ? 26 : 22} />
+                  }`}>
+                    <tab.icon size={22} />
                     {active && (
                       <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-400" />
                     )}

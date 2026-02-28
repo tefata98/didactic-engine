@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Mic, Play, Pause, RotateCcw, Clock, Flame, Target, ChevronDown, ChevronUp,
-  Music, Wind, BookOpen, ListMusic, Star, Plus, X, Check, AlertTriangle, Music2, Volume2
+  Music, Wind, BookOpen, ListMusic, Star, Plus, X, Check, AlertTriangle, Music2, Volume2,
+  Heart, Droplets, Ban, Stethoscope, Moon as MoonIcon, Thermometer, ChevronRight
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import GlassCard from '../components/GlassCard';
@@ -13,7 +14,9 @@ import AnimatedNumber from '../components/AnimatedNumber';
 import EmptyState from '../components/EmptyState';
 import useTimer from '../hooks/useTimer';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { warmUpRoutines, slsExerciseCategories, breathingExercises, theoryLessons, sethRiggsBio } from '../modules/vocals/vocalsData';
+import { warmUpRoutines, slsExerciseCategories, breathingExercises, theoryLessons, sethRiggsBio, vocalHealthTips, dailyRoutines } from '../modules/vocals/vocalsData';
+import { getDateKey } from '../utils/dateHelpers';
+import { NAMESPACES, DAYS_SHORT } from '../utils/constants';
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: Mic },
@@ -22,11 +25,6 @@ const tabs = [
   { id: 'breathing', label: 'Breathing', icon: Wind },
   { id: 'theory', label: 'Theory', icon: BookOpen },
   { id: 'setlist', label: 'Setlist', icon: ListMusic },
-];
-
-const practiceData = [
-  { day: 'Mon', mins: 25 }, { day: 'Tue', mins: 30 }, { day: 'Wed', mins: 0 },
-  { day: 'Thu', mins: 20 }, { day: 'Fri', mins: 25 }, { day: 'Sat', mins: 15 }, { day: 'Sun', mins: 0 },
 ];
 
 function ChartTip({ active, payload, label }) {
@@ -44,6 +42,74 @@ function OverviewTab() {
   const timer = useTimer(0);
   const goalSeconds = 25 * 60;
   const progress = Math.min((timer.time / goalSeconds) * 100, 100);
+  const [practiceLog, setPracticeLog] = useLocalStorage('lifeos_vocals', 'practiceLog', []);
+  const wasRunningRef = useRef(false);
+
+  // Auto-log practice session when timer is paused after running for > 60 seconds
+  useEffect(() => {
+    if (wasRunningRef.current && !timer.isRunning && timer.time > 60) {
+      const todayKey = getDateKey();
+      // Check if we already logged for this exact duration to avoid duplicates
+      setPracticeLog(prev => [
+        ...prev,
+        { id: Date.now().toString(), date: todayKey, duration: timer.time, type: 'practice' }
+      ]);
+    }
+    wasRunningRef.current = timer.isRunning;
+  }, [timer.isRunning]);
+
+  // Compute stats from practiceLog
+  const stats = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - dayOfWeek);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const thisWeekSessions = practiceLog.filter(s => {
+      const d = new Date(s.date);
+      return d >= weekStart;
+    });
+    const thisWeekDays = new Set(thisWeekSessions.map(s => s.date)).size;
+
+    const totalSessions = practiceLog.length;
+
+    const avgMin = totalSessions > 0
+      ? Math.round(practiceLog.reduce((sum, s) => sum + (s.duration || 0), 0) / totalSessions / 60)
+      : 0;
+
+    // Compute streak: consecutive days with practice
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const dateKey = getDateKey(new Date(today.getTime() - i * 86400000));
+      const hasPractice = practiceLog.some(s => s.date === dateKey);
+      if (hasPractice) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      } else {
+        break;
+      }
+    }
+
+    return { thisWeekDays, totalSessions, avgMin, streak };
+  }, [practiceLog]);
+
+  // Compute practice chart data for last 7 days
+  const practiceChartData = useMemo(() => {
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 86400000);
+      const dateKey = getDateKey(date);
+      const dayIdx = (date.getDay() + 6) % 7;
+      const dayName = DAYS_SHORT[dayIdx];
+      const daySessions = practiceLog.filter(s => s.date === dateKey);
+      const totalMins = Math.round(daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
+      data.push({ day: dayName, mins: totalMins });
+    }
+    return data;
+  }, [practiceLog]);
 
   return (
     <div className="space-y-5">
@@ -67,10 +133,10 @@ function OverviewTab() {
 
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'This Week', value: '4/5', icon: Target },
-          { label: 'Total', value: 47, icon: Mic },
-          { label: 'Avg Min', value: 22, icon: Clock },
-          { label: 'Streak', value: 4, icon: Flame },
+          { label: 'This Week', value: `${stats.thisWeekDays}/5`, icon: Target },
+          { label: 'Total', value: stats.totalSessions, icon: Mic },
+          { label: 'Avg Min', value: stats.avgMin, icon: Clock },
+          { label: 'Streak', value: stats.streak, icon: Flame },
         ].map(s => (
           <GlassCard key={s.label} padding="p-3" className="text-center">
             <s.icon size={16} className="text-pink-400 mx-auto mb-1.5" />
@@ -85,7 +151,7 @@ function OverviewTab() {
       <GlassCard>
         <h3 className="font-heading font-semibold text-white mb-4">Weekly Practice</h3>
         <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={practiceData}>
+          <BarChart data={practiceChartData}>
             <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} />
             <Tooltip content={<ChartTip />} cursor={false} />
             <Bar dataKey="mins" radius={[4, 4, 0, 0]} fill="#ec4899" />
@@ -112,6 +178,70 @@ function OverviewTab() {
         <h4 className="text-sm font-semibold text-white mb-1">Today's Recommended</h4>
         <p className="text-sm text-white/60">Full SLS Session (25 min) — build your mix voice for weekend rehearsal</p>
       </GlassCard>
+
+      {/* Daily Routines */}
+      <div>
+        <h3 className="font-heading font-semibold text-white mb-3 flex items-center gap-2">
+          <Clock size={16} className="text-pink-400" />
+          Suggested Routines
+        </h3>
+        <div className="space-y-3">
+          {dailyRoutines.map(routine => (
+            <GlassCard key={routine.id} padding="p-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h4 className="text-sm font-semibold text-white">{routine.name}</h4>
+                  <Badge color="#ec4899" size="sm">{routine.duration}</Badge>
+                </div>
+                <ChevronRight size={16} className="text-white/30 mt-1" />
+              </div>
+              <p className="text-xs text-white/50 leading-relaxed mb-2">{routine.description}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {routine.exercises.map(ex => (
+                  <span key={ex} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-pink-500/10 text-pink-300">
+                    {ex}
+                  </span>
+                ))}
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </div>
+
+      {/* Vocal Health Tips */}
+      <div>
+        <h3 className="font-heading font-semibold text-white mb-3 flex items-center gap-2">
+          <Heart size={16} className="text-rose-400" />
+          Vocal Health
+        </h3>
+        <div className="space-y-3">
+          {vocalHealthTips.map((tip, i) => {
+            const iconMap = {
+              droplet: Droplets,
+              ban: Ban,
+              alert: AlertTriangle,
+              stethoscope: Stethoscope,
+              moon: MoonIcon,
+              flame: Flame,
+              wind: Wind,
+            };
+            const TipIcon = iconMap[tip.icon] || Heart;
+            return (
+              <GlassCard key={i} padding="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <TipIcon size={16} className="text-rose-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-white mb-1">{tip.title}</h4>
+                    <p className="text-xs text-white/50 leading-relaxed">{tip.description}</p>
+                  </div>
+                </div>
+              </GlassCard>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

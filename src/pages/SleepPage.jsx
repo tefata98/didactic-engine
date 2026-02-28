@@ -21,42 +21,8 @@ import { getDateKey, formatDate, getDayName } from '../utils/dateHelpers';
 
 const ACCENT = '#818cf8';
 
-function generateMockSleepData() {
-  const data = [];
-  const now = new Date();
-  const bedtimeTargets = ['22:30', '23:00', '23:15', '22:45', '23:30', '00:15', '23:00'];
-  const qualities = [4, 3, 5, 3, 4, 2, 4];
-  const sleepHours = [7.2, 6.5, 8.1, 6.8, 7.5, 5.9, 7.3];
-
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(now.getTime() - i * 86400000);
-    const dateKey = getDateKey(date);
-    const idx = 6 - i;
-    const bedHour = parseInt(bedtimeTargets[idx].split(':')[0], 10);
-    const bedMin = parseInt(bedtimeTargets[idx].split(':')[1], 10);
-    const sleepDuration = sleepHours[idx];
-    const wakeHour = Math.floor((bedHour + sleepDuration) % 24);
-    const wakeMin = Math.round((sleepDuration % 1) * 60);
-
-    data.push({
-      date: dateKey,
-      bedtime: bedtimeTargets[idx],
-      wakeTime: `${String(wakeHour).padStart(2, '0')}:${String(wakeMin).padStart(2, '0')}`,
-      quality: qualities[idx],
-      duration: sleepHours[idx],
-      windDown: {
-        screensOff: idx !== 5,
-        brainDump: idx % 2 === 0,
-        roomCool: true,
-        noCaffeine: idx !== 3,
-      },
-    });
-  }
-  return data;
-}
-
 const DEFAULT_DATA = {
-  entries: generateMockSleepData(),
+  entries: [],
   targetBedtime: '23:00',
   windDownChecklist: {
     screensOff: false,

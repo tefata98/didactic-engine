@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Light" />
+    <meta name="description" content="Your personal life dashboard — track sleep, fitness, finances, and goals." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="manifest" href="/didactic-engine/manifest.json" />
+    <link rel="apple-touch-icon" href="/didactic-engine/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/didactic-engine/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/didactic-engine/icon-512.png" />
+    <title>Light</title>
+    <script type="module" crossorigin src="/didactic-engine/assets/index-B0_94x7T.js"></script>
+    <link rel="stylesheet" crossorigin href="/didactic-engine/assets/index-ycqAuqlO.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/javascript">
+      // SPA redirect handler for GitHub Pages 404.html
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/didactic-engine/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>

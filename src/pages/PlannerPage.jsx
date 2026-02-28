@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   ChevronLeft, ChevronRight, Plus, Check, X, Sun, Sunset, Moon,
   Briefcase, Dumbbell, Mic, BookOpen, DollarSign, User, Flame, Calendar
@@ -30,23 +30,32 @@ const defaultHabits = [
   { id: 'no_screens', label: 'No screens 10pm', short: 'SCR' },
 ];
 
-const defaultTasks = [
-  { id: '1', title: 'Review candidate profiles', time: '09:00', block: 'morning', category: 'work', done: false },
-  { id: '2', title: 'Upper Push Workout', time: '07:00', block: 'morning', category: 'fitness', done: false },
-  { id: '3', title: 'SLS Vocal Warm-Up', time: '18:00', block: 'evening', category: 'vocals', done: false },
-  { id: '4', title: 'Read 20 pages', time: '21:00', block: 'evening', category: 'reading', done: false },
-  { id: '5', title: 'Interview prep — Backend Senior', time: '14:00', block: 'afternoon', category: 'work', done: false },
-];
-
 export default function PlannerPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState('day');
   const [showAddTask, setShowAddTask] = useState(false);
   const dateKey = getDateKey(selectedDate);
 
-  const [allTasks, setAllTasks] = useLocalStorage('lifeos_planner', 'tasks', { [getDateKey()]: defaultTasks });
+  const [allTasks, setAllTasks] = useLocalStorage('lifeos_planner', 'tasks', {});
   const [allHabits, setAllHabits] = useLocalStorage('lifeos_planner', 'habits', {});
   const [reflections, setReflections] = useLocalStorage('lifeos_planner', 'reflections', {});
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'n') {
+        e.preventDefault();
+        setShowAddTask(true);
+      }
+      if (e.key === 'Escape') {
+        setShowAddTask(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const tasks = allTasks[dateKey] || [];
   const dayHabits = allHabits[dateKey] || {};
@@ -317,9 +326,9 @@ function AddTaskModal({ onAdd, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center overflow-y-auto" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-4 md:mb-0 animate-slideUp" onClick={e => e.stopPropagation()}>
+      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-24 md:mb-0 max-h-[85vh] overflow-y-auto animate-slideUp" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-heading font-semibold text-white text-lg">Add Task</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">

@@ -1,9 +1,43 @@
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Sidebar from './Sidebar';
+import LockScreen from './LockScreen';
+import useNotifications from '../hooks/useNotifications';
+import useBiometric from '../hooks/useBiometric';
+import { useApp } from '../context/AppContext';
 
 export default function AppShell({ children }) {
   const location = useLocation();
+  const { state } = useApp();
+  const { scheduleReminders } = useNotifications();
+  const { isLocked, isAuthenticating, authenticate, unlock } = useBiometric();
+
+  // Scroll to top on page/tab change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // Schedule notifications via Service Worker
+  useEffect(() => {
+    if (state.settings.notifications) {
+      scheduleReminders(state.settings.reminders);
+    }
+  }, [state.settings.notifications, state.settings.reminders, scheduleReminders]);
+
+  // Apply dark mode on mount
+  useEffect(() => {
+    if (!state.settings.darkMode) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, [state.settings.darkMode]);
+
+  // Show lock screen if biometric lock is active
+  if (isLocked) {
+    return <LockScreen onUnlock={authenticate} isAuthenticating={isAuthenticating} onSkip={unlock} />;
+  }
 
   return (
     <div className="min-h-screen bg-base text-white relative">
@@ -39,7 +73,7 @@ export default function AppShell({ children }) {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="relative z-10 md:ml-64 pb-24 md:pb-8 min-h-screen">
+      <main className="relative z-10 md:ml-64 pb-32 md:pb-8 min-h-screen">
         <div key={location.pathname} className="page-enter px-5 pt-6 md:px-8 md:pt-8 max-w-3xl mx-auto">
           {children}
         </div>

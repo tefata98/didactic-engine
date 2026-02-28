@@ -46,7 +46,7 @@ export default function Sidebar() {
           <Zap size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-lg font-heading font-bold gradient-text">LifeOS</h1>
+          <h1 className="text-lg font-heading font-bold gradient-text">Light</h1>
           <p className="text-[10px] text-white/30">Personal Dashboard</p>
         </div>
       </div>

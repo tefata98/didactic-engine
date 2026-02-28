@@ -49,20 +49,9 @@ const WANT_TO_READ_BOOKS = [
 
 const DEFAULT_DATA = {
   books: [
-    { id: 'cur-1', title: 'Deep Work', author: 'Cal Newport', category: 'Habits', totalPages: 296, pagesRead: 142, shelf: 'reading', startDate: '2026-02-10' },
     ...WANT_TO_READ_BOOKS,
-    { id: 'done-1', title: 'The Almanack of Naval Ravikant', author: 'Eric Jorgenson', category: 'Finance', totalPages: 242, pagesRead: 242, shelf: 'completed', startDate: '2026-01-05', completedDate: '2026-01-28' },
-    { id: 'done-2', title: 'Digital Minimalism', author: 'Cal Newport', category: 'Technology', totalPages: 284, pagesRead: 284, shelf: 'completed', startDate: '2025-12-01', completedDate: '2025-12-22' },
   ],
-  readingLog: [
-    { id: 'log-1', bookId: 'cur-1', pages: 25, date: getDateKey(new Date(Date.now() - 86400000 * 0)), minutes: 30 },
-    { id: 'log-2', bookId: 'cur-1', pages: 18, date: getDateKey(new Date(Date.now() - 86400000 * 1)), minutes: 22 },
-    { id: 'log-3', bookId: 'cur-1', pages: 30, date: getDateKey(new Date(Date.now() - 86400000 * 2)), minutes: 35 },
-    { id: 'log-4', bookId: 'cur-1', pages: 15, date: getDateKey(new Date(Date.now() - 86400000 * 3)), minutes: 18 },
-    { id: 'log-5', bookId: 'cur-1', pages: 22, date: getDateKey(new Date(Date.now() - 86400000 * 5)), minutes: 25 },
-    { id: 'log-6', bookId: 'cur-1', pages: 20, date: getDateKey(new Date(Date.now() - 86400000 * 6)), minutes: 24 },
-    { id: 'log-7', bookId: 'cur-1', pages: 12, date: getDateKey(new Date(Date.now() - 86400000 * 7)), minutes: 16 },
-  ],
+  readingLog: [],
   dailyGoal: { minutes: 15, pages: 20 },
 };
 
