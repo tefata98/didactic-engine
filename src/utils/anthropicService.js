@@ -15,8 +15,8 @@ export async function generateNews(apiKey, interests = []) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      system: 'You are a personalized news curator. Generate 10 realistic news articles as a JSON array. Each article must have: id (unique string), title, summary (2-3 sentences), category (one of: Sleep, Fitness, Finance, Music, Vocals, Recruitment, Tech), tags (array of 2-3 relevant tags), source (realistic publication name), and publishedAt (ISO 8601 date string within the last 24 hours). Return ONLY valid JSON with no markdown formatting, no code fences, and no extra text.',
+      max_tokens: 8192,
+      system: 'You are a personalized news curator. Generate 10 realistic news articles as a JSON array. Each article must have: id (unique string), title, summary (2-3 sentences), content (full article body, 4-6 paragraphs of informative text), category (one of: Sleep, Fitness, Finance, Music, Vocals, Recruitment, Tech), tags (array of 2-3 relevant tags), source (realistic publication name), readingTime (estimated minutes as integer), and publishedAt (ISO 8601 date string within the last 24 hours). Return ONLY valid JSON with no markdown formatting, no code fences, and no extra text.',
       messages: [{
         role: 'user',
         content: `Generate 10 news articles matching these interest categories: ${categoriesStr}.
@@ -27,15 +27,17 @@ Return ONLY a valid JSON array with this structure:
     "id": "unique-id",
     "title": "Article title",
     "summary": "2-3 sentence summary with practical, useful information",
+    "content": "Full article body with 4-6 paragraphs. Include practical advice, research findings, expert quotes, and actionable takeaways. Separate paragraphs with \\n\\n.",
     "category": "One of: Sleep, Fitness, Finance, Music, Vocals, Recruitment, Tech",
     "tags": ["tag1", "tag2", "tag3"],
     "source": "Realistic source name",
+    "readingTime": 3,
     "publishedAt": "ISO 8601 date string within the last 24 hours",
     "featured": false
   }
 ]
 
-Make exactly 2-3 articles "featured": true. Make the content factually accurate and practically useful.`
+Make exactly 2-3 articles "featured": true. Make the content factually accurate and practically useful. Each article's content should be 4-6 substantive paragraphs.`
       }],
     }),
   });

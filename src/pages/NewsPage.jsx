@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Bookmark, Share2, ExternalLink, Clock,
-  Filter, TrendingUp, ChevronRight, Tag, Search, Newspaper,
-  RefreshCw, X, Loader2, AlertCircle, Zap
+  Filter, TrendingUp, ChevronRight, ChevronLeft, Tag, Search, Newspaper,
+  RefreshCw, X, Loader2, AlertCircle, Zap, BookOpen
 } from 'lucide-react';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/PageHeader';
@@ -27,7 +27,7 @@ const CATEGORY_COLORS = {
 
 const CATEGORIES = ['All', 'Sleep', 'Fitness', 'Finance', 'Music', 'Vocals', 'Recruitment', 'Tech'];
 
-const SIX_HOURS = 6 * 60 * 60 * 1000;
+const ONE_HOUR = 60 * 60 * 1000;
 
 function ArticleCard({ article, isBookmarked, onToggleBookmark, onShare, onSelect, featured = false }) {
   const categoryColor = CATEGORY_COLORS[article.category] || COLORS.primary;
@@ -40,6 +40,12 @@ function ArticleCard({ article, isBookmarked, onToggleBookmark, onShare, onSelec
           <div className="flex items-center gap-2 mb-3">
             <Badge color={categoryColor}>{article.category}</Badge>
             <span className="text-xs text-white/30">Featured</span>
+            {article.readingTime && (
+              <span className="text-xs text-white/30 flex items-center gap-1 ml-auto">
+                <BookOpen size={10} />
+                {article.readingTime} min read
+              </span>
+            )}
           </div>
           <h3 className="font-heading font-bold text-white text-lg mb-2 leading-tight">{article.title}</h3>
           <p className="text-sm text-white/60 leading-relaxed mb-4">{article.summary}</p>
@@ -96,6 +102,12 @@ function ArticleCard({ article, isBookmarked, onToggleBookmark, onShare, onSelec
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
                 <Badge color={categoryColor}>{article.category}</Badge>
+                {article.readingTime && (
+                  <span className="text-[10px] text-white/30 flex items-center gap-0.5">
+                    <BookOpen size={9} />
+                    {article.readingTime}m
+                  </span>
+                )}
               </div>
               <h4 className="font-medium text-white text-sm leading-tight mb-1.5">{article.title}</h4>
               <p className="text-xs text-white/50 leading-relaxed line-clamp-2 mb-2">{article.summary}</p>
@@ -144,6 +156,122 @@ function ArticleCard({ article, isBookmarked, onToggleBookmark, onShare, onSelec
   );
 }
 
+function ArticleDetail({ article, isBookmarked, onToggleBookmark, onShare, onClose }) {
+  const categoryColor = CATEGORY_COLORS[article.category] || COLORS.primary;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-[#0f172a] overflow-y-auto"
+      onClick={onClose}
+    >
+      <div className="min-h-full" onClick={e => e.stopPropagation()}>
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 bg-[#0f172a]/95 backdrop-blur-lg border-b border-white/5">
+          <div className="flex items-center justify-between px-5 py-3 max-w-2xl mx-auto">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            >
+              <ChevronLeft size={20} />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onToggleBookmark(article.id)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                {isBookmarked ? (
+                  <Bookmark size={18} style={{ color: categoryColor }} className="fill-current" />
+                ) : (
+                  <Bookmark size={18} className="text-white/40" />
+                )}
+              </button>
+              <button
+                onClick={() => onShare(article)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <Share2 size={18} className="text-white/40" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Article Content */}
+        <div className="max-w-2xl mx-auto px-5 pt-6 pb-16">
+          {/* Category + Reading Time */}
+          <div className="flex items-center gap-3 mb-4">
+            <Badge color={categoryColor}>{article.category}</Badge>
+            {article.readingTime && (
+              <span className="text-xs text-white/40 flex items-center gap-1">
+                <BookOpen size={12} />
+                {article.readingTime} min read
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h1 className="text-2xl font-heading font-bold text-white mb-4 leading-tight">
+            {article.title}
+          </h1>
+
+          {/* Meta */}
+          <div className="flex items-center gap-3 text-sm text-white/40 mb-6 pb-6 border-b border-white/5">
+            <span className="font-medium text-white/60">{article.source}</span>
+            <span className="text-white/20">|</span>
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {getRelativeTime(article.publishedAt)}
+            </span>
+          </div>
+
+          {/* Summary (highlighted) */}
+          <div
+            className="rounded-xl p-4 mb-6"
+            style={{ background: `${categoryColor}10`, borderLeft: `3px solid ${categoryColor}` }}
+          >
+            <p className="text-sm text-white/70 leading-relaxed italic">
+              {article.summary}
+            </p>
+          </div>
+
+          {/* Full Content */}
+          {article.content ? (
+            <div className="prose prose-invert max-w-none">
+              {article.content.split('\n\n').map((paragraph, i) => (
+                <p key={i} className="text-[15px] text-white/70 leading-relaxed mb-4">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-white/50 italic">
+              Full article content not available. This article was generated before full content support was added.
+              Refresh your news feed to get full articles.
+            </p>
+          )}
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-white/5">
+            <Tag size={14} className="text-white/30" />
+            {article.tags?.map(tag => (
+              <span
+                key={tag}
+                className="px-3 py-1 rounded-full text-xs"
+                style={{
+                  background: `${categoryColor}15`,
+                  color: `${categoryColor}cc`,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NewsPage() {
   const { state } = useApp();
   const { settings } = state;
@@ -173,9 +301,9 @@ export default function NewsPage() {
     }
   }, [apiKey, setArticles, setLastFetch]);
 
-  // Auto-fetch on mount if needed
+  // Auto-fetch on mount if stale (1 hour)
   useEffect(() => {
-    if (apiKey && (articles.length === 0 || Date.now() - lastFetch > SIX_HOURS)) {
+    if (apiKey && (articles.length === 0 || Date.now() - lastFetch > ONE_HOUR)) {
       fetchArticles();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -244,8 +372,32 @@ export default function NewsPage() {
     return counts;
   }, [articles]);
 
+  const lastUpdatedText = useMemo(() => {
+    if (!lastFetch) return null;
+    const diff = Date.now() - lastFetch;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Updated just now';
+    if (mins < 60) return `Updated ${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Updated ${hours}h ago`;
+    return `Updated ${Math.floor(hours / 24)}d ago`;
+  }, [lastFetch]);
+
+  // Show article detail as full page
+  if (selectedArticle) {
+    return (
+      <ArticleDetail
+        article={selectedArticle}
+        isBookmarked={bookmarks.includes(selectedArticle.id)}
+        onToggleBookmark={toggleBookmark}
+        onShare={handleShare}
+        onClose={() => setSelectedArticle(null)}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-6 pb-4">
+    <div className="space-y-4 pb-4">
       <PageHeader
         title="News Feed"
         subtitle="Curated articles for your interests"
@@ -255,18 +407,29 @@ export default function NewsPage() {
               <button
                 onClick={fetchArticles}
                 disabled={loading}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/20 transition-all disabled:opacity-50"
               >
-                <RefreshCw size={16} className={`text-white/60 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw size={14} className={`text-indigo-400 ${loading ? 'animate-spin' : ''}`} />
+                <span className="text-xs font-medium text-indigo-400">Refresh</span>
               </button>
             )}
-            <div className="flex items-center gap-2">
-              <Bookmark size={16} className="text-white/40" />
-              <span className="text-sm text-white/40">{bookmarkCount} saved</span>
-            </div>
           </div>
         }
       />
+
+      {/* Last Updated + Bookmark Count */}
+      {articles.length > 0 && (
+        <div className="flex items-center justify-between text-xs text-white/30 px-1">
+          <span className="flex items-center gap-1.5">
+            <Clock size={11} />
+            {lastUpdatedText}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Bookmark size={11} />
+            {bookmarkCount} saved
+          </span>
+        </div>
+      )}
 
       {/* No API Key Message */}
       {!apiKey && (
@@ -302,44 +465,56 @@ export default function NewsPage() {
         </GlassCard>
       )}
 
-      {/* Search */}
+      {/* Sticky Category Chips + Search */}
       {articles.length > 0 && (
-        <div className="relative">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search articles..."
-            className="glass-input text-sm pl-10"
-          />
-        </div>
-      )}
+        <div className="sticky top-0 z-30 -mx-5 px-5 pt-2 pb-3 bg-[#0f172a]/95 backdrop-blur-lg">
+          {/* Search */}
+          <div className="relative mb-3">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search articles..."
+              className="glass-input text-sm pl-10"
+            />
+          </div>
 
-      {/* Category Filter Pills */}
-      {articles.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          {CATEGORIES.map(cat => {
-            const color = CATEGORY_COLORS[cat];
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                  isActive ? 'text-white' : 'text-white/50 hover:text-white/70'
-                }`}
-                style={{
-                  background: isActive ? `${color}25` : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${isActive ? `${color}40` : 'rgba(255,255,255,0.06)'}`,
-                  color: isActive ? color : undefined,
-                }}
-              >
-                {cat}
-                <span className="text-xs opacity-60">{categoryCount[cat]}</span>
-              </button>
-            );
-          })}
+          {/* Category Chips — Horizontal Scrollable */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {CATEGORIES.map(cat => {
+              const color = CATEGORY_COLORS[cat];
+              const isActive = activeCategory === cat;
+              const count = categoryCount[cat];
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                    isActive ? 'text-white shadow-lg' : 'text-white/50 hover:text-white/70'
+                  }`}
+                  style={{
+                    background: isActive ? `${color}30` : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${isActive ? `${color}50` : 'rgba(255,255,255,0.06)'}`,
+                    color: isActive ? color : undefined,
+                    boxShadow: isActive ? `0 2px 12px ${color}20` : 'none',
+                  }}
+                >
+                  {cat}
+                  {count > 0 && (
+                    <span
+                      className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                      style={{
+                        background: isActive ? `${color}30` : 'rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -396,59 +571,6 @@ export default function NewsPage() {
             action={{ label: 'View All', onClick: () => { setActiveCategory('All'); setSearchQuery(''); } }}
           />
         )
-      )}
-
-      {/* Article Detail Modal - Full Screen */}
-      {selectedArticle && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md overflow-y-auto"
-          onClick={() => setSelectedArticle(null)}
-        >
-          <div className="min-h-full flex flex-col" onClick={e => e.stopPropagation()}>
-            {/* Close button */}
-            <div className="flex justify-end p-4 sticky top-0 z-10">
-              <button
-                onClick={() => setSelectedArticle(null)}
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              >
-                <X size={20} className="text-white" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 max-w-2xl w-full mx-auto px-6 pb-12">
-              <Badge color={CATEGORY_COLORS[selectedArticle.category]}>{selectedArticle.category}</Badge>
-              <h1 className="text-2xl font-heading font-bold text-white mt-4 mb-4 leading-tight">
-                {selectedArticle.title}
-              </h1>
-              <div className="flex items-center gap-3 text-sm text-white/40 mb-6">
-                <span>{selectedArticle.source}</span>
-                <span>|</span>
-                <span className="flex items-center gap-1">
-                  <Clock size={12} />
-                  {getRelativeTime(selectedArticle.publishedAt)}
-                </span>
-              </div>
-              <p className="text-base text-white/70 leading-relaxed whitespace-pre-line">
-                {selectedArticle.summary}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-6">
-                {selectedArticle.tags?.map(tag => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-full text-xs"
-                    style={{
-                      background: `${CATEGORY_COLORS[selectedArticle.category] || COLORS.primary}15`,
-                      color: `${CATEGORY_COLORS[selectedArticle.category] || COLORS.primary}cc`,
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
