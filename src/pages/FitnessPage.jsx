@@ -5,6 +5,7 @@ import {
   Activity, Target, Clock, Plus, Trash2, X, AlertTriangle, Zap, BookOpen
 } from 'lucide-react';
 import MuscleGroupDiagram from '../components/MuscleGroupDiagram';
+import ExerciseIllustration from '../components/ExerciseIllustration';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/PageHeader';
 import TabBar from '../components/TabBar';
@@ -381,6 +382,209 @@ const WORKOUT_SCHEDULE = {
   },
 };
 
+const ALTERNATIVE_EXERCISES = {
+  A: [
+    {
+      id: 'lateral_raises',
+      name: 'Banded Lateral Raises',
+      sets: 3,
+      reps: '12',
+      rest: 60,
+      description: 'Stand on the band with feet hip-width apart. With arms slightly bent, raise hands out to the sides until parallel with the floor. Lower with control.',
+      muscles: { primary: ['shoulders'], secondary: ['traps'] },
+      formTips: [
+        'Keep a slight bend in your elbows throughout the entire lift.',
+        'Lead with your elbows, not your hands, to maximize shoulder engagement.',
+        'Pause briefly at the top and lower over 2-3 seconds.',
+      ],
+      commonMistakes: [
+        'Using momentum by swinging the arms up instead of lifting with control.',
+        'Shrugging the shoulders up toward the ears during the raise.',
+        'Lifting too high above parallel, which shifts tension to the traps.',
+      ],
+      progressionTips: [
+        'Add a 2-second hold at the top of each rep for greater time under tension.',
+        'Shorten the band by widening your stance for more resistance.',
+      ],
+    },
+    {
+      id: 'diamond_pushups',
+      name: 'Diamond Push-Ups (Banded)',
+      sets: 3,
+      reps: '10',
+      rest: 60,
+      description: 'Place band across upper back. Form a diamond shape with hands under chest. Lower until chest touches hands, then push up. Emphasizes triceps.',
+      muscles: { primary: ['triceps', 'chest'], secondary: ['shoulders', 'core'] },
+      formTips: [
+        'Place your hands directly under your chest forming a diamond with index fingers and thumbs.',
+        'Keep your elbows tucked close to your body throughout the movement.',
+        'Maintain a straight plank position from head to heels.',
+      ],
+      commonMistakes: [
+        'Flaring the elbows out wide, reducing tricep involvement.',
+        'Letting the hips sag or pike up during the movement.',
+        'Not lowering far enough to achieve full range of motion.',
+      ],
+      progressionTips: [
+        'Use a thicker band for added resistance at the top.',
+        'Add a 2-second pause at the bottom for more chest activation.',
+      ],
+    },
+  ],
+  B: [
+    {
+      id: 'leg_curls',
+      name: 'Banded Leg Curls',
+      sets: 3,
+      reps: '12',
+      rest: 60,
+      description: 'Anchor band low and attach to ankle. Lying face down, curl your heel toward your glutes against band resistance. Squeeze hamstrings at peak.',
+      muscles: { primary: ['hamstrings'], secondary: ['glutes', 'calves'] },
+      formTips: [
+        'Keep your hips pressed firmly into the floor throughout the curl.',
+        'Curl your heel as close to your glutes as possible for full contraction.',
+        'Lower slowly over 2-3 seconds to maximize eccentric loading.',
+      ],
+      commonMistakes: [
+        'Lifting the hips off the floor to generate momentum.',
+        'Using a jerky motion instead of a controlled, steady curl.',
+        'Not achieving full range of motion at the top of the curl.',
+      ],
+      progressionTips: [
+        'Add a 2-second squeeze at peak contraction on every rep.',
+        'Progress to standing leg curls for added balance challenge.',
+      ],
+    },
+    {
+      id: 'split_squats',
+      name: 'Split Squats with Band',
+      sets: 3,
+      reps: '10',
+      rest: 60,
+      description: 'Stand on band with front foot, hold handles at shoulders. Lower into a lunge position until rear knee nearly touches floor. Push up through front heel.',
+      muscles: { primary: ['quads', 'glutes'], secondary: ['hamstrings', 'core'] },
+      formTips: [
+        'Keep your front knee tracking over your toes and do not let it cave inward.',
+        'Lower until your back knee nearly touches the floor for full depth.',
+        'Drive up through the front heel while squeezing your glutes.',
+      ],
+      commonMistakes: [
+        'Leaning the torso too far forward instead of staying upright.',
+        'Taking too narrow a stance, which causes balance issues.',
+        'Pushing off the back foot instead of driving through the front leg.',
+      ],
+      progressionTips: [
+        'Elevate the rear foot on a step for Bulgarian split squats.',
+        'Add a 3-second pause at the bottom for increased quad engagement.',
+      ],
+    },
+    {
+      id: 'hip_abductions',
+      name: 'Banded Hip Abductions',
+      sets: 3,
+      reps: '15',
+      rest: 60,
+      description: 'Place mini band above knees. Stand or sit with feet together. Push knees apart against band resistance. Hold at peak, return with control.',
+      muscles: { primary: ['glutes'], secondary: ['core'] },
+      formTips: [
+        'Keep your core engaged and torso stable throughout the movement.',
+        'Push your knees apart as far as possible against the band.',
+        'Hold the fully open position for 1-2 seconds before returning.',
+      ],
+      commonMistakes: [
+        'Using momentum to snap the knees open instead of controlled movement.',
+        'Letting the knees collapse back too quickly without controlling the return.',
+        'Leaning excessively forward or backward during the movement.',
+      ],
+      progressionTips: [
+        'Use a heavier mini band for greater glute activation.',
+        'Combine with glute bridges for a superset targeting the glutes.',
+      ],
+    },
+  ],
+  C: [
+    {
+      id: 'reverse_flyes',
+      name: 'Reverse Flyes',
+      sets: 3,
+      reps: '12',
+      rest: 60,
+      description: 'Hold band in front with arms extended. Hinge slightly at hips. Pull band apart by squeezing rear delts and upper back. Control the return.',
+      muscles: { primary: ['shoulders', 'back'], secondary: ['traps'] },
+      formTips: [
+        'Hinge slightly at the hips and keep a soft bend in your knees.',
+        'Squeeze your shoulder blades together as you pull the band apart.',
+        'Keep your arms nearly straight with just a slight elbow bend.',
+      ],
+      commonMistakes: [
+        'Standing too upright, which reduces rear delt engagement.',
+        'Bending the elbows excessively, turning it into a row.',
+        'Using momentum by jerking the band apart.',
+      ],
+      progressionTips: [
+        'Hold the fully open position for 3 seconds per rep.',
+        'Use a shorter grip on the band for more resistance.',
+      ],
+    },
+    {
+      id: 'hammer_curls',
+      name: 'Hammer Curls',
+      sets: 3,
+      reps: '12',
+      rest: 60,
+      description: 'Stand on the band with a neutral (palms facing each other) grip. Curl handles up keeping palms facing inward throughout. Squeeze at top.',
+      muscles: { primary: ['biceps'], secondary: ['shoulders'] },
+      formTips: [
+        'Keep your palms facing each other (neutral grip) throughout the curl.',
+        'Pin your elbows to your sides and avoid swinging.',
+        'Squeeze the biceps and brachialis at the top of each rep.',
+      ],
+      commonMistakes: [
+        'Rotating the wrists during the curl instead of maintaining a neutral grip.',
+        'Swinging the torso to create momentum.',
+        'Rushing the lowering phase instead of using a controlled negative.',
+      ],
+      progressionTips: [
+        'Add a 2-second isometric hold at the peak of each curl.',
+        'Alternate arms to increase focus on each side independently.',
+      ],
+    },
+    {
+      id: 'pallof_press',
+      name: 'Pallof Press',
+      sets: 3,
+      reps: '10',
+      rest: 60,
+      description: 'Anchor band at chest height to your side. Hold handle at chest. Press arms straight out, resisting the rotational pull. Hold 2 seconds, return.',
+      muscles: { primary: ['core'], secondary: ['shoulders', 'chest'] },
+      formTips: [
+        'Stand perpendicular to the anchor point with feet shoulder-width apart.',
+        'Press the band straight out from your chest and resist any rotation.',
+        'Hold the fully extended position for 2 seconds before returning.',
+      ],
+      commonMistakes: [
+        'Allowing the torso to rotate toward the anchor point.',
+        'Standing too close to the anchor, reducing the anti-rotation demand.',
+        'Rushing through reps instead of holding at full extension.',
+      ],
+      progressionTips: [
+        'Increase hold time at full extension to 4-5 seconds.',
+        'Step further from anchor to increase rotational resistance.',
+      ],
+    },
+  ],
+};
+
+const WEEKLY_SCHEDULE = [
+  { day: 'Mon', workoutKey: 'A', label: 'Day A', name: 'Upper Push', color: '#a78bfa', isRest: false },
+  { day: 'Tue', workoutKey: null, label: 'Rest', name: 'Rest Day', color: '#6b7280', isRest: true },
+  { day: 'Wed', workoutKey: 'B', label: 'Day B', name: 'Lower Body', color: '#22c55e', isRest: false },
+  { day: 'Thu', workoutKey: null, label: 'Rest', name: 'Rest Day', color: '#6b7280', isRest: true },
+  { day: 'Fri', workoutKey: 'C', label: 'Day C', name: 'Upper Pull', color: '#6366f1', isRest: false },
+  { day: 'Sat', workoutKey: null, label: 'Rest', name: 'Rest Day', color: '#6b7280', isRest: true },
+  { day: 'Sun', workoutKey: null, label: 'Rest', name: 'Rest Day', color: '#6b7280', isRest: true },
+];
+
 function getTodaysWorkout() {
   const dayOfWeek = getDayOfWeek();
   if (dayOfWeek === 0) return 'A';
@@ -426,6 +630,7 @@ const TABS = [
   { id: 'workout', label: "Today's Workout", icon: Dumbbell },
   { id: 'progress', label: 'Progress', icon: TrendingUp },
   { id: 'body', label: 'Body Stats', icon: Scale },
+  { id: 'schedule', label: 'Schedule', icon: Calendar },
 ];
 
 function RestTimer({ onComplete }) {
@@ -511,6 +716,128 @@ function RestTimer({ onComplete }) {
   );
 }
 
+function ExerciseDetailView({ exercise, workoutColor }) {
+  const allMuscles = [...(exercise.muscles?.primary || []), ...(exercise.muscles?.secondary || [])];
+  const hasFrontMuscles = allMuscles.some((m) =>
+    ['chest', 'shoulders', 'biceps', 'triceps', 'core', 'quads', 'calves'].includes(m)
+  );
+  const hasBackMuscles = allMuscles.some((m) =>
+    ['back', 'lats', 'traps', 'glutes', 'hamstrings', 'calves'].includes(m)
+  );
+
+  return (
+    <div className="space-y-4 mt-4">
+      {/* Exercise Illustration */}
+      <div className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+        <ExerciseIllustration exerciseId={exercise.id} color={workoutColor} />
+      </div>
+
+      {/* Muscle Group Diagrams */}
+      <div className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+        <h4 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3">Muscles Targeted</h4>
+        <div className="flex justify-center gap-6">
+          {hasFrontMuscles && (
+            <MuscleGroupDiagram
+              primaryMuscles={exercise.muscles.primary}
+              highlightedMuscles={exercise.muscles.secondary}
+              view="front"
+              size={100}
+              accentColor={workoutColor}
+            />
+          )}
+          {hasBackMuscles && (
+            <MuscleGroupDiagram
+              primaryMuscles={exercise.muscles.primary}
+              highlightedMuscles={exercise.muscles.secondary}
+              view="back"
+              size={100}
+              accentColor={workoutColor}
+            />
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-3 justify-center">
+          {exercise.muscles.primary.map((m) => (
+            <span
+              key={m}
+              className="px-2 py-0.5 rounded-md text-[10px] font-medium"
+              style={{ background: `${workoutColor}25`, color: workoutColor }}
+            >
+              {m}
+            </span>
+          ))}
+          {exercise.muscles.secondary.map((m) => (
+            <span
+              key={m}
+              className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/5 text-white/40"
+            >
+              {m}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Form Tips */}
+      {exercise.formTips && exercise.formTips.length > 0 && (
+        <div className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+          <h4 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <BookOpen size={14} style={{ color: workoutColor }} />
+            Form Tips
+          </h4>
+          <ol className="space-y-2">
+            {exercise.formTips.map((tip, i) => (
+              <li key={i} className="flex gap-2.5 text-xs text-white/60 leading-relaxed">
+                <span
+                  className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                  style={{ background: `${workoutColor}20`, color: workoutColor }}
+                >
+                  {i + 1}
+                </span>
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {/* Common Mistakes */}
+      {exercise.commonMistakes && exercise.commonMistakes.length > 0 && (
+        <div className="rounded-xl bg-orange-500/[0.04] border border-orange-500/10 p-4">
+          <h4 className="text-xs font-semibold text-orange-400/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <AlertTriangle size={14} className="text-orange-400" />
+            Common Mistakes
+          </h4>
+          <ul className="space-y-2">
+            {exercise.commonMistakes.map((mistake, i) => (
+              <li key={i} className="flex gap-2.5 text-xs text-white/60 leading-relaxed">
+                <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-400/60 mt-1.5" />
+                <span>{mistake}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Progression */}
+      {exercise.progressionTips && exercise.progressionTips.length > 0 && (
+        <div className="rounded-xl bg-green-500/[0.04] border border-green-500/10 p-4">
+          <h4 className="text-xs font-semibold text-green-400/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <TrendingUp size={14} className="text-green-400" />
+            Progression
+          </h4>
+          <ul className="space-y-2">
+            {exercise.progressionTips.map((tip, i) => (
+              <li key={i} className="flex gap-2.5 text-xs text-white/60 leading-relaxed">
+                <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-400/60 mt-1.5" />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ExerciseCard({ exercise, completedSets, onToggleSet, workoutColor }) {
   const [expanded, setExpanded] = useState(false);
   const allCompleted = completedSets.length === exercise.sets;
@@ -556,7 +883,9 @@ function ExerciseCard({ exercise, completedSets, onToggleSet, workoutColor }) {
       {expanded && (
         <div className="px-4 pb-4 border-t border-white/5">
           <p className="text-xs text-white/40 mt-3 mb-4 leading-relaxed">{exercise.description}</p>
-          <div className="flex gap-2">
+
+          {/* Set tracking buttons */}
+          <div className="flex gap-2 mb-2">
             {Array.from({ length: exercise.sets }, (_, i) => {
               const completed = completedSets.includes(i);
               return (
@@ -583,13 +912,98 @@ function ExerciseCard({ exercise, completedSets, onToggleSet, workoutColor }) {
               );
             })}
           </div>
+
+          {/* Detailed exercise view */}
+          <ExerciseDetailView exercise={exercise} workoutColor={workoutColor} />
         </div>
       )}
     </GlassCard>
   );
 }
 
-function WorkoutTab({ todayKey, fitnessData, setFitnessData }) {
+function AlternativeExerciseCard({ exercise, workoutColor }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-xl bg-white/[0.03] border border-white/5 overflow-hidden transition-all">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 p-3 text-left"
+      >
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: `${workoutColor}15` }}
+        >
+          <Zap size={14} style={{ color: workoutColor }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="font-medium text-xs text-white/80">{exercise.name}</span>
+          <span className="block text-[10px] text-white/35">
+            {exercise.sets} x {exercise.reps} &middot; {exercise.rest}s rest
+          </span>
+        </div>
+        {expanded ? (
+          <ChevronUp size={14} className="text-white/25" />
+        ) : (
+          <ChevronDown size={14} className="text-white/25" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="px-3 pb-3 border-t border-white/5">
+          <p className="text-xs text-white/40 mt-2 mb-2 leading-relaxed">{exercise.description}</p>
+          <ExerciseDetailView exercise={exercise} workoutColor={workoutColor} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AlternativeExercisesSection({ workoutType, workoutColor }) {
+  const [expanded, setExpanded] = useState(false);
+  const alternatives = ALTERNATIVE_EXERCISES[workoutType] || [];
+
+  if (alternatives.length === 0) return null;
+
+  return (
+    <GlassCard padding="p-0" className="overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 p-4 text-left"
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: `${workoutColor}10` }}
+        >
+          <Zap size={18} style={{ color: workoutColor, opacity: 0.7 }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="font-medium text-sm text-white/70">Alternative Exercises</span>
+          <span className="block text-xs text-white/35">{alternatives.length} swap-in options</span>
+        </div>
+        {expanded ? (
+          <ChevronUp size={16} className="text-white/30" />
+        ) : (
+          <ChevronDown size={16} className="text-white/30" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="px-4 pb-4 border-t border-white/5 space-y-2 pt-3">
+          {alternatives.map((exercise) => (
+            <AlternativeExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              workoutColor={workoutColor}
+            />
+          ))}
+        </div>
+      )}
+    </GlassCard>
+  );
+}
+
+function WorkoutTab({ todayKey, fitnessData, setFitnessData, onNavigateToWorkout }) {
   const workoutType = getTodaysWorkout();
   const workout = workoutType ? WORKOUT_SCHEDULE[workoutType] : null;
 
@@ -698,7 +1112,113 @@ function WorkoutTab({ todayKey, fitnessData, setFitnessData }) {
         ))}
       </div>
 
+      <AlternativeExercisesSection workoutType={workoutType} workoutColor={workout.color} />
+
       <RestTimer />
+    </div>
+  );
+}
+
+function ScheduleTab({ onSelectWorkout }) {
+  return (
+    <div className="space-y-4">
+      <GlassCard>
+        <h3 className="font-heading font-semibold text-white mb-1">Weekly Schedule</h3>
+        <p className="text-xs text-white/40 mb-5">3-day push/pull/legs split with rest days for recovery</p>
+
+        <div className="space-y-2.5">
+          {WEEKLY_SCHEDULE.map((entry) => {
+            const workout = entry.workoutKey ? WORKOUT_SCHEDULE[entry.workoutKey] : null;
+            const exerciseCount = workout ? workout.exercises.length : 0;
+
+            if (entry.isRest) {
+              return (
+                <div
+                  key={entry.day}
+                  className="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/[0.02] border border-white/5"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-white/20">{entry.day}</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-sm text-white/30 font-medium">{entry.name}</span>
+                    <span className="block text-[10px] text-white/15">Recovery & mobility</span>
+                  </div>
+                  <span className="text-xs text-white/15">--</span>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={entry.day}
+                onClick={() => onSelectWorkout(entry.workoutKey)}
+                className="w-full flex items-center gap-3 py-3 px-4 rounded-xl border transition-all active:scale-[0.98]"
+                style={{
+                  background: `${entry.color}08`,
+                  borderColor: `${entry.color}20`,
+                }}
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${entry.color}20` }}
+                >
+                  <span className="text-xs font-bold" style={{ color: entry.color }}>{entry.day}</span>
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white font-medium">{entry.name}</span>
+                    <Badge color={entry.color} size="sm">{entry.label}</Badge>
+                  </div>
+                  <span className="text-[10px] text-white/40">{exerciseCount} exercises &middot; ~35 min</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Dumbbell size={14} style={{ color: entry.color, opacity: 0.5 }} />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </GlassCard>
+
+      <GlassCard>
+        <h3 className="font-heading font-semibold text-white mb-3 flex items-center gap-2">
+          <Target size={16} style={{ color: ACCENT }} />
+          Program Overview
+        </h3>
+        <div className="space-y-3">
+          {Object.entries(WORKOUT_SCHEDULE).map(([key, workout]) => (
+            <div
+              key={key}
+              className="flex items-start gap-3 py-2 px-3 rounded-xl bg-white/[0.03] border border-white/5"
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ background: `${workout.color}20` }}
+              >
+                <Dumbbell size={14} style={{ color: workout.color }} />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-white font-medium">{workout.name}</span>
+                  <Badge color={workout.color} size="sm">{workout.dayLabel}</Badge>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {[...new Set(workout.exercises.flatMap((ex) => ex.muscles.primary))].map((muscle) => (
+                    <span
+                      key={muscle}
+                      className="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                      style={{ background: `${workout.color}15`, color: `${workout.color}cc` }}
+                    >
+                      {muscle}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
     </div>
   );
 }
@@ -1108,6 +1628,10 @@ export default function FitnessPage() {
     ? `${workout.dayLabel}: ${workout.name} — ${getDayName()}`
     : `Rest Day — Next: ${getNextWorkoutDay()}`;
 
+  const handleScheduleWorkoutSelect = (workoutKey) => {
+    setActiveTab('workout');
+  };
+
   return (
     <div className="space-y-6 pb-4">
       <PageHeader
@@ -1136,6 +1660,10 @@ export default function FitnessPage() {
 
       {activeTab === 'body' && (
         <BodyStatsTab fitnessData={fitnessData} setFitnessData={setFitnessData} />
+      )}
+
+      {activeTab === 'schedule' && (
+        <ScheduleTab onSelectWorkout={handleScheduleWorkoutSelect} />
       )}
     </div>
   );
