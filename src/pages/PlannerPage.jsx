@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
   ChevronLeft, ChevronRight, Plus, Check, X, Sun, Sunset, Moon,
-  Briefcase, Dumbbell, Mic, BookOpen, DollarSign, User, Flame, Calendar
+  Briefcase, Dumbbell, Mic, BookOpen, DollarSign, User, Flame, Calendar, Trash2
 } from 'lucide-react';
 import GlassCard from '../components/GlassCard';
 import ProgressBar from '../components/ProgressBar';
@@ -67,6 +67,10 @@ export default function PlannerPage() {
 
   const toggleTask = (id) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(t => t.id !== id));
   };
 
   const addTask = (task) => {
@@ -157,7 +161,7 @@ export default function PlannerPage() {
                 className="flex flex-col items-center gap-1.5 flex-shrink-0"
                 title={habit.label}
               >
-                <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${
+                <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all ${
                   checked ? 'border-indigo-400 bg-indigo-500/20' : 'border-white/15 bg-white/5'
                 }`}>
                   {checked ? <Check size={16} className="text-indigo-400" /> : <span className="text-[10px] text-white/40">{habit.short}</span>}
@@ -222,6 +226,12 @@ export default function PlannerPage() {
                               <p className={`text-sm ${task.done ? 'line-through text-white/40' : 'text-white'}`}>{task.title}</p>
                             </div>
                             <span className="text-xs text-white/30 flex-shrink-0">{task.time}</span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); deleteTask(task.id); }}
+                              className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors flex-shrink-0"
+                            >
+                              <Trash2 size={14} className="text-white/30 hover:text-red-400" />
+                            </button>
                           </div>
                         );
                       })}
@@ -328,7 +338,7 @@ function AddTaskModal({ onAdd, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center overflow-y-auto" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-24 md:mb-0 max-h-[85vh] overflow-y-auto animate-slideUp" onClick={e => e.stopPropagation()}>
+      <div className="relative glass-card w-full max-w-md p-6 mx-4 mb-6 md:mb-0 max-h-[80vh] overflow-y-auto animate-slideUp" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-heading font-semibold text-white text-lg">Add Task</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
