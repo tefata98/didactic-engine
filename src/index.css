@@ -4,6 +4,96 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========== CSS Custom Properties (Dark Theme — Default) ========== */
+:root {
+  --bg-base: #0f172a;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-input: rgba(255, 255, 255, 0.1);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-card-sm: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --text-primary: #e2e8f0;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-faint: rgba(255, 255, 255, 0.2);
+  --orb-opacity: 1;
+}
+
+/* ========== Light Theme ========== */
+[data-theme="light"] {
+  --bg-base: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-input: rgba(0, 0, 0, 0.04);
+  --border-card: rgba(0, 0, 0, 0.08);
+  --border-input: rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --shadow-card-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --text-primary: #1e293b;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --text-muted: rgba(0, 0, 0, 0.45);
+  --text-faint: rgba(0, 0, 0, 0.15);
+  --orb-opacity: 0.3;
+}
+
+[data-theme="light"] html,
+[data-theme="light"] body,
+[data-theme="light"] #root {
+  background: var(--bg-base);
+}
+
+[data-theme="light"] body {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .text-white {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-white\/70,
+[data-theme="light"] .text-white\/60,
+[data-theme="light"] .text-white\/50 {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] .text-white\/40,
+[data-theme="light"] .text-white\/30 {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="light"] .text-white\/20,
+[data-theme="light"] .text-white\/15 {
+  color: var(--text-faint) !important;
+}
+
+[data-theme="light"] .bg-white\/5,
+[data-theme="light"] .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .hover\:bg-white\/10:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .divide-white\/5 > * + * {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .floating-orb {
+  opacity: var(--orb-opacity);
+}
+
+[data-theme="light"] .placeholder-white\/30::placeholder {
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -13,7 +103,7 @@
 
 html, body, #root {
   height: 100%;
-  background: #0f172a;
+  background: var(--bg-base);
   overflow-x: hidden;
 }
 
@@ -21,7 +111,7 @@ body {
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #e2e8f0;
+  color: var(--text-primary);
   /* Safe area: push content below status bar / Dynamic Island on iOS */
   padding-top: constant(safe-area-inset-top);
   padding-top: env(safe-area-inset-top, 0px);
@@ -42,28 +132,33 @@ body {
 @layer components {
   .glass-card {
     @apply relative overflow-hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-card);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
   }
 
   .glass-card-sm {
     @apply relative overflow-hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-card);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card-sm);
   }
 
   .glass-input {
-    @apply w-full px-4 py-3 rounded-xl text-white placeholder-white/30 outline-none transition-all;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply w-full px-4 py-3 rounded-xl outline-none transition-all;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+  }
+
+  .glass-input::placeholder {
+    color: var(--text-muted);
   }
 
   .glass-input:focus {
@@ -81,14 +176,15 @@ body {
   }
 
   .btn-ghost {
-    @apply px-4 py-2 rounded-xl font-medium text-white/70 transition-all active:scale-95;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply px-4 py-2 rounded-xl font-medium transition-all active:scale-95;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-card);
   }
 
   .btn-ghost:hover {
-    @apply text-white;
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
   }
 
   .gradient-text {
@@ -143,4 +239,9 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Lock screen */
+.lock-screen {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
 }

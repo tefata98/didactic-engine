@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Mic, Play, Pause, RotateCcw, Clock, Flame, Target, ChevronDown, ChevronUp,
-  Music, Wind, BookOpen, ListMusic, Star, Plus, X, Check, AlertTriangle, Music2, Volume2
+  Music, Wind, BookOpen, ListMusic, Star, Plus, X, Check, AlertTriangle, Music2, Volume2,
+  Heart, Droplets, Ban, Stethoscope, Moon as MoonIcon, Thermometer, ChevronRight
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import GlassCard from '../components/GlassCard';
@@ -13,7 +14,7 @@ import AnimatedNumber from '../components/AnimatedNumber';
 import EmptyState from '../components/EmptyState';
 import useTimer from '../hooks/useTimer';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { warmUpRoutines, slsExerciseCategories, breathingExercises, theoryLessons, sethRiggsBio } from '../modules/vocals/vocalsData';
+import { warmUpRoutines, slsExerciseCategories, breathingExercises, theoryLessons, sethRiggsBio, vocalHealthTips, dailyRoutines } from '../modules/vocals/vocalsData';
 import { getDateKey } from '../utils/dateHelpers';
 import { NAMESPACES, DAYS_SHORT } from '../utils/constants';
 
@@ -177,6 +178,70 @@ function OverviewTab() {
         <h4 className="text-sm font-semibold text-white mb-1">Today's Recommended</h4>
         <p className="text-sm text-white/60">Full SLS Session (25 min) — build your mix voice for weekend rehearsal</p>
       </GlassCard>
+
+      {/* Daily Routines */}
+      <div>
+        <h3 className="font-heading font-semibold text-white mb-3 flex items-center gap-2">
+          <Clock size={16} className="text-pink-400" />
+          Suggested Routines
+        </h3>
+        <div className="space-y-3">
+          {dailyRoutines.map(routine => (
+            <GlassCard key={routine.id} padding="p-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h4 className="text-sm font-semibold text-white">{routine.name}</h4>
+                  <Badge color="#ec4899" size="sm">{routine.duration}</Badge>
+                </div>
+                <ChevronRight size={16} className="text-white/30 mt-1" />
+              </div>
+              <p className="text-xs text-white/50 leading-relaxed mb-2">{routine.description}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {routine.exercises.map(ex => (
+                  <span key={ex} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-pink-500/10 text-pink-300">
+                    {ex}
+                  </span>
+                ))}
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </div>
+
+      {/* Vocal Health Tips */}
+      <div>
+        <h3 className="font-heading font-semibold text-white mb-3 flex items-center gap-2">
+          <Heart size={16} className="text-rose-400" />
+          Vocal Health
+        </h3>
+        <div className="space-y-3">
+          {vocalHealthTips.map((tip, i) => {
+            const iconMap = {
+              droplet: Droplets,
+              ban: Ban,
+              alert: AlertTriangle,
+              stethoscope: Stethoscope,
+              moon: MoonIcon,
+              flame: Flame,
+              wind: Wind,
+            };
+            const TipIcon = iconMap[tip.icon] || Heart;
+            return (
+              <GlassCard key={i} padding="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <TipIcon size={16} className="text-rose-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-white mb-1">{tip.title}</h4>
+                    <p className="text-xs text-white/50 leading-relaxed">{tip.description}</p>
+                  </div>
+                </div>
+              </GlassCard>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
