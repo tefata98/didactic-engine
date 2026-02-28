@@ -15,16 +15,13 @@ import { fetchAllNews } from '../utils/newsService';
 
 const CATEGORY_COLORS = {
   All: COLORS.primary,
-  Sleep: COLORS.sleep,
-  Fitness: COLORS.fitness,
-  Finance: COLORS.finance,
-  Music: '#f97316',
-  Vocals: COLORS.vocals,
-  Recruitment: COLORS.work,
+  'Talent Acquisition': COLORS.work,
+  Singing: COLORS.vocals,
+  'ЦСКА София': '#d32f2f',
   Tech: '#38bdf8',
 };
 
-const CATEGORIES = ['All', 'Sleep', 'Fitness', 'Finance', 'Music', 'Vocals', 'Recruitment', 'Tech'];
+const CATEGORIES = ['All', 'Talent Acquisition', 'Singing', 'ЦСКА София', 'Tech'];
 
 const ONE_HOUR = 60 * 60 * 1000;
 

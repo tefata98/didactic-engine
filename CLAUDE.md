@@ -23,7 +23,7 @@
 | Routing | React Router DOM 7 |
 | Charts | Recharts 3 |
 | Icons | Lucide React |
-| Backend | Supabase (auth + data sync) |
+| Backend | Supabase (optional data sync) |
 | Tests | Vitest + jsdom + Testing Library |
 | PWA | Service Worker (`public/sw.js`, cache v3) |
 
@@ -33,13 +33,13 @@
 
 ```
 src/
-  pages/          # 10 pages + LoginPage
+  pages/          # 10 pages (no login — app is open)
   components/     # AppShell, BottomNav, LockScreen, ExerciseIllustration, MuscleGroupDiagram
   hooks/          # useSounds, useBiometric, useNotifications, useTimer
-  utils/          # supabase.js, syncService.js, anthropicService.js, storageService.js, dateHelpers.js, constants.js
-  context/        # AppContext.jsx (global state: user, settings, notifications, auth)
+  utils/          # supabase.js, syncService.js, newsService.js, storageService.js, dateHelpers.js, constants.js
+  context/        # AppContext.jsx (global state: user, settings, notifications)
   modules/        # vocals/vocalsData.js
-  routes.jsx      # All routes + AuthGuard
+  routes.jsx      # All routes (no auth guard)
   index.css       # CSS custom properties, dark/light theme, glass morphism
 public/
   sw.js           # Service Worker (cache, background notifications, offline mode)
@@ -61,10 +61,9 @@ public/
 | Finance | `/finance` | Budget tracking, spending charts |
 | Reading | `/reading` | Book list, reading timer |
 | Sleep | `/sleep` | Sleep tracker, wind-down routine |
-| News | `/news` | AI-generated news (Anthropic API), 1hr cache, category chips |
+| News | `/news` | RSS news feed (Google News), 1hr cache, category chips: Talent Acquisition, Singing, ЦСКА София, Tech |
 | Profile | `/profile` | User profile |
-| Settings | `/settings` | Dark mode, sounds, Face ID, offline, sync, logout |
-| Login | `/login` | Username + password, auto-signup, guest mode |
+| Settings | `/settings` | Dark mode, sounds, Face ID, offline, sync |
 
 ---
 
@@ -97,17 +96,9 @@ updated_at timestamptz
 
 ---
 
-## Auth / Login
+## Auth
 
-- Login maps username to email: `tefata` → `tefata@gmail.com`
-- Auto-signup: tries signIn first, falls back to signUp if user doesn't exist
-- Auth state persisted in localStorage via `NAMESPACES.identity`
-- "Continue without login" → guest mode (no sync)
-- AuthGuard in `src/routes.jsx` redirects unauthenticated users to `/login`
-
-**Credentials for the app:**
-- Username: `tefata`
-- Password: `thedark`
+Auth/login was removed. The app is open — no login required. Supabase sync is optional (available in Settings if a user is authenticated via Supabase, but gracefully skips if not).
 
 ---
 
@@ -151,14 +142,15 @@ updated_at timestamptz
 - **Sprint 4:** Dark/light theme toggle, Web Audio sounds, WebAuthn biometrics, offline mode SW toggle
 - **Sprint 5:** Supabase auth, login page, pull/push sync, settings page with logout
 - **Sprint 6:** Vitest setup, 26 tests passing (dateHelpers + storageService)
+- **Sprint 7:** Planner bug fixes (modal overflow, task deletion, habit touch targets), personalized News feed (Talent Acquisition, Singing, ЦСКА София, Tech), syncService crash fix, dead code cleanup
 
 ---
 
 ## Known Issues / Pending
 
 - Supabase network is blocked in Claude Code sandbox — use Dashboard UI for SQL + user creation
-- Email domain is `@gmail.com` (not `@light.app` — Supabase rejects `.app` TLD)
 - GitHub Pages deploy requires push to `main` (GitHub Actions workflow in `.github/workflows/deploy.yml`)
+- News RSS depends on `api.allorigins.win` CORS proxy — if it goes down, RSS fetches fail
 
 ---
 
@@ -184,8 +176,8 @@ git push origin main
 |------|---------|
 | `src/utils/constants.js` | NAMESPACES, DEFAULT_SETTINGS, USER_PROFILE |
 | `src/utils/storageService.js` | localStorage abstraction by namespace |
-| `src/utils/syncService.js` | Supabase pull/push/debouncedPush |
-| `src/utils/anthropicService.js` | AI news generation (Anthropic API) |
+| `src/utils/syncService.js` | Supabase pull/push/debouncedPush (graceful no-op without auth) |
+| `src/utils/newsService.js` | RSS news feed from Google News via CORS proxy |
 | `src/utils/supabase.js` | Supabase client (hardcoded creds) |
 | `public/sw.js` | Service Worker — cache, notifications, offline |
 | `supabase-setup.sql` | Full SQL to run in Supabase Dashboard |

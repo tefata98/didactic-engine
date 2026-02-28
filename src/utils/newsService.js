@@ -1,12 +1,9 @@
 const CORS_PROXY = 'https://api.allorigins.win/get?url=';
 
 const CATEGORY_QUERIES = {
-  Sleep: 'sleep+health+science+tips',
-  Fitness: 'fitness+workout+exercise+training',
-  Finance: 'personal+finance+investing+markets',
-  Music: 'music+industry+new+album+releases',
-  Vocals: 'singing+vocal+training+voice',
-  Recruitment: 'job+market+hiring+career+recruitment',
+  'Talent Acquisition': 'talent+acquisition+recruiting+hiring+HR',
+  Singing: 'singing+vocal+training+voice+technique',
+  'ЦСКА София': 'ЦСКА+София+CSKA+Sofia+football',
   Tech: 'technology+AI+software+programming',
 };
 

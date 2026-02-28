@@ -17,8 +17,8 @@ const SyncService = {
     const supabase = getActiveSupabase();
     if (!supabase) throw new Error('Supabase not configured');
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+    if (!user) return { synced: 0 };
 
     const { data, error } = await supabase
       .from('user_data')
@@ -52,8 +52,8 @@ const SyncService = {
     const supabase = getActiveSupabase();
     if (!supabase) throw new Error('Supabase not configured');
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+    if (!user) return { synced: 0 };
 
     const upserts = [];
     NAMESPACES.forEach(ns => {

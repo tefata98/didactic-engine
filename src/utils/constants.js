@@ -47,9 +47,6 @@ export const DEFAULT_SETTINGS = {
   autoSync: false,
   faceId: false,
   offlineMode: true,
-  anthropicApiKey: '',
-  supabaseUrl: '',
-  supabaseAnonKey: '',
   lastSyncTime: null,
   reminders: {
     sleepWindDown: { enabled: true, time: '22:30' },
