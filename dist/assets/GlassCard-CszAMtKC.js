@@ -1,1 +1,0 @@
-import{j as e}from"./index-DAXhUYq3.js";function n({children:s,className:a="",onClick:r,hover:t=!1,padding:o="p-5"}){return e.jsx("div",{onClick:r,className:`glass-card ${o} ${t?"hover:bg-white/[0.06] cursor-pointer":""} ${r?"cursor-pointer":""} transition-all duration-300 ${a}`,children:s})}export{n as G};
