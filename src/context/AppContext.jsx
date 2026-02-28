@@ -7,11 +7,7 @@ const AppContext = createContext(null);
 const defaultState = {
   user: USER_PROFILE,
   settings: DEFAULT_SETTINGS,
-  notifications: [
-    { id: 1, text: 'Vocal practice in 30 minutes', read: false },
-    { id: 2, text: 'You hit a 7-day reading streak!', read: false },
-    { id: 3, text: 'Budget review is due', read: true },
-  ],
+  notifications: [],
 };
 
 function loadInitialState() {

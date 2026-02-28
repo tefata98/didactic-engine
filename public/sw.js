@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifeos-v1';
+const CACHE_NAME = 'light-v2';
 const ASSETS_TO_PRECACHE = [
   '/didactic-engine/',
   '/didactic-engine/index.html',
@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
 // Push notification handler
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || 'LifeOS';
+  const title = data.title || 'Light';
   const options = {
     body: data.body || 'You have a new notification',
     icon: '/didactic-engine/icon-192.png',

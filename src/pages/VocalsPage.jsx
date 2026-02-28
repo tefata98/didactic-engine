@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Mic, Play, Pause, RotateCcw, Clock, Flame, Target, ChevronDown, ChevronUp,
   Music, Wind, BookOpen, ListMusic, Star, Plus, X, Check, AlertTriangle, Music2, Volume2
@@ -14,6 +14,8 @@ import EmptyState from '../components/EmptyState';
 import useTimer from '../hooks/useTimer';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { warmUpRoutines, slsExerciseCategories, breathingExercises, theoryLessons, sethRiggsBio } from '../modules/vocals/vocalsData';
+import { getDateKey } from '../utils/dateHelpers';
+import { NAMESPACES, DAYS_SHORT } from '../utils/constants';
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: Mic },
@@ -22,11 +24,6 @@ const tabs = [
   { id: 'breathing', label: 'Breathing', icon: Wind },
   { id: 'theory', label: 'Theory', icon: BookOpen },
   { id: 'setlist', label: 'Setlist', icon: ListMusic },
-];
-
-const practiceData = [
-  { day: 'Mon', mins: 25 }, { day: 'Tue', mins: 30 }, { day: 'Wed', mins: 0 },
-  { day: 'Thu', mins: 20 }, { day: 'Fri', mins: 25 }, { day: 'Sat', mins: 15 }, { day: 'Sun', mins: 0 },
 ];
 
 function ChartTip({ active, payload, label }) {
@@ -44,6 +41,74 @@ function OverviewTab() {
   const timer = useTimer(0);
   const goalSeconds = 25 * 60;
   const progress = Math.min((timer.time / goalSeconds) * 100, 100);
+  const [practiceLog, setPracticeLog] = useLocalStorage('lifeos_vocals', 'practiceLog', []);
+  const wasRunningRef = useRef(false);
+
+  // Auto-log practice session when timer is paused after running for > 60 seconds
+  useEffect(() => {
+    if (wasRunningRef.current && !timer.isRunning && timer.time > 60) {
+      const todayKey = getDateKey();
+      // Check if we already logged for this exact duration to avoid duplicates
+      setPracticeLog(prev => [
+        ...prev,
+        { id: Date.now().toString(), date: todayKey, duration: timer.time, type: 'practice' }
+      ]);
+    }
+    wasRunningRef.current = timer.isRunning;
+  }, [timer.isRunning]);
+
+  // Compute stats from practiceLog
+  const stats = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - dayOfWeek);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const thisWeekSessions = practiceLog.filter(s => {
+      const d = new Date(s.date);
+      return d >= weekStart;
+    });
+    const thisWeekDays = new Set(thisWeekSessions.map(s => s.date)).size;
+
+    const totalSessions = practiceLog.length;
+
+    const avgMin = totalSessions > 0
+      ? Math.round(practiceLog.reduce((sum, s) => sum + (s.duration || 0), 0) / totalSessions / 60)
+      : 0;
+
+    // Compute streak: consecutive days with practice
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const dateKey = getDateKey(new Date(today.getTime() - i * 86400000));
+      const hasPractice = practiceLog.some(s => s.date === dateKey);
+      if (hasPractice) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      } else {
+        break;
+      }
+    }
+
+    return { thisWeekDays, totalSessions, avgMin, streak };
+  }, [practiceLog]);
+
+  // Compute practice chart data for last 7 days
+  const practiceChartData = useMemo(() => {
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 86400000);
+      const dateKey = getDateKey(date);
+      const dayIdx = (date.getDay() + 6) % 7;
+      const dayName = DAYS_SHORT[dayIdx];
+      const daySessions = practiceLog.filter(s => s.date === dateKey);
+      const totalMins = Math.round(daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
+      data.push({ day: dayName, mins: totalMins });
+    }
+    return data;
+  }, [practiceLog]);
 
   return (
     <div className="space-y-5">
@@ -67,10 +132,10 @@ function OverviewTab() {
 
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'This Week', value: '4/5', icon: Target },
-          { label: 'Total', value: 47, icon: Mic },
-          { label: 'Avg Min', value: 22, icon: Clock },
-          { label: 'Streak', value: 4, icon: Flame },
+          { label: 'This Week', value: `${stats.thisWeekDays}/5`, icon: Target },
+          { label: 'Total', value: stats.totalSessions, icon: Mic },
+          { label: 'Avg Min', value: stats.avgMin, icon: Clock },
+          { label: 'Streak', value: stats.streak, icon: Flame },
         ].map(s => (
           <GlassCard key={s.label} padding="p-3" className="text-center">
             <s.icon size={16} className="text-pink-400 mx-auto mb-1.5" />
@@ -85,7 +150,7 @@ function OverviewTab() {
       <GlassCard>
         <h3 className="font-heading font-semibold text-white mb-4">Weekly Practice</h3>
         <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={practiceData}>
+          <BarChart data={practiceChartData}>
             <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} />
             <Tooltip content={<ChartTip />} cursor={false} />
             <Bar dataKey="mins" radius={[4, 4, 0, 0]} fill="#ec4899" />

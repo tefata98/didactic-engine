@@ -2,8 +2,9 @@ import { useState, useMemo, useCallback } from 'react';
 import {
   Dumbbell, Play, Pause, RotateCcw, Check, ChevronDown, ChevronUp,
   Flame, Trophy, Calendar, TrendingUp, Timer, Scale, Ruler,
-  Activity, Target, Clock, Plus, Trash2, X
+  Activity, Target, Clock, Plus, Trash2, X, AlertTriangle, Zap, BookOpen
 } from 'lucide-react';
+import MuscleGroupDiagram from '../components/MuscleGroupDiagram';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/PageHeader';
 import TabBar from '../components/TabBar';
@@ -32,6 +33,21 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Place the band across your upper back, holding ends under your palms. Perform push-ups with controlled tempo, keeping core engaged throughout.',
+        muscles: { primary: ['chest', 'triceps'], secondary: ['shoulders', 'core'] },
+        formTips: [
+          'Keep your body in a straight line from head to heels throughout the movement.',
+          'Lower your chest to just above the floor with a 2-second negative.',
+          'Push through your palms and squeeze your chest at the top of each rep.',
+        ],
+        commonMistakes: [
+          'Letting the hips sag or pike up, breaking the plank position.',
+          'Flaring elbows out to 90 degrees instead of keeping them at 45 degrees.',
+          'Not using full range of motion by cutting reps short at the bottom.',
+        ],
+        progressionTips: [
+          'Use a thicker band or double up bands to increase resistance over time.',
+          'Slow the eccentric (lowering) phase to 4 seconds for greater time under tension.',
+        ],
       },
       {
         id: 'ohp',
@@ -40,6 +56,21 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Stand on the band, grip at shoulder width. Press overhead to full extension, keeping ribs down and core braced. Lower with control.',
+        muscles: { primary: ['shoulders'], secondary: ['triceps', 'core'] },
+        formTips: [
+          'Brace your core and squeeze your glutes to stabilize your torso.',
+          'Press the band straight up, finishing with arms fully locked out overhead.',
+          'Keep your ribs down and avoid arching your lower back excessively.',
+        ],
+        commonMistakes: [
+          'Leaning back excessively and turning the press into an incline movement.',
+          'Not fully extending the arms at the top, reducing shoulder activation.',
+          'Using momentum by bending the knees to initiate the press.',
+        ],
+        progressionTips: [
+          'Widen your stance on the band to shorten it, increasing resistance.',
+          'Add a 2-second pause at the top of each rep for improved stability.',
+        ],
       },
       {
         id: 'flyes',
@@ -48,6 +79,20 @@ const WORKOUT_SCHEDULE = {
         reps: '10',
         rest: 60,
         description: 'Anchor band behind you at chest height. With slight elbow bend, bring hands together in front of chest. Squeeze pecs at peak contraction.',
+        muscles: { primary: ['chest'], secondary: ['shoulders'] },
+        formTips: [
+          'Maintain a slight bend in your elbows throughout the entire movement.',
+          'Focus on squeezing your chest muscles together at the front of the motion.',
+          'Control the return phase; do not let the band snap your arms back.',
+        ],
+        commonMistakes: [
+          'Straightening the arms fully, turning it into a press instead of a fly.',
+          'Rushing the eccentric phase and losing tension on the chest.',
+        ],
+        progressionTips: [
+          'Hold the peak contraction for 2 seconds to increase muscle engagement.',
+          'Step further from the anchor point to increase band tension.',
+        ],
       },
       {
         id: 'tricep_ext',
@@ -56,6 +101,21 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Anchor band overhead. Face away, extend arms forward from behind head. Keep elbows close to ears, fully extend at the bottom.',
+        muscles: { primary: ['triceps'], secondary: ['shoulders'] },
+        formTips: [
+          'Keep your elbows pinned close to your ears and pointing forward.',
+          'Extend your arms fully to achieve a complete tricep contraction.',
+          'Lean slightly forward at the hips for better stability and stretch.',
+        ],
+        commonMistakes: [
+          'Allowing the elbows to flare out wide, shifting load off the triceps.',
+          'Using shoulder movement to compensate instead of isolating the triceps.',
+          'Cutting the range of motion short by not fully extending the arms.',
+        ],
+        progressionTips: [
+          'Add a 1-second squeeze at full extension on every rep.',
+          'Use a heavier band or choke up for more resistance at the peak.',
+        ],
       },
       {
         id: 'plank_pull',
@@ -64,6 +124,20 @@ const WORKOUT_SCHEDULE = {
         reps: '30s',
         rest: 90,
         description: 'Hold a forearm plank with band looped around wrists. Alternate pulling one hand forward while stabilizing with the other. Maintain neutral spine.',
+        muscles: { primary: ['core', 'shoulders'], secondary: ['chest', 'back'] },
+        formTips: [
+          'Maintain a neutral spine — avoid letting your hips sag or pike up.',
+          'Pull one hand forward slowly while keeping the other arm stable.',
+          'Breathe steadily and do not hold your breath during the hold.',
+        ],
+        commonMistakes: [
+          'Rotating the torso excessively when pulling the band forward.',
+          'Letting the hips drop or rise out of the plank position.',
+        ],
+        progressionTips: [
+          'Increase the hold time by 10 seconds each week as you get stronger.',
+          'Use a thicker band to increase anti-rotation demand on your core.',
+        ],
       },
     ],
   },
@@ -79,6 +153,21 @@ const WORKOUT_SCHEDULE = {
         reps: '15',
         rest: 60,
         description: 'Stand on the band with feet shoulder-width apart. Hold band at shoulders. Squat to parallel keeping knees tracking over toes. Drive up through heels.',
+        muscles: { primary: ['quads', 'glutes'], secondary: ['core', 'hamstrings'] },
+        formTips: [
+          'Keep your chest up and eyes forward throughout the squat.',
+          'Push your knees out in line with your toes as you descend.',
+          'Drive through your heels to stand up, squeezing glutes at the top.',
+        ],
+        commonMistakes: [
+          'Letting the knees cave inward during the ascent.',
+          'Rounding the lower back instead of maintaining a neutral spine.',
+          'Rising onto the toes instead of keeping weight on the heels.',
+        ],
+        progressionTips: [
+          'Add a 3-second pause at the bottom of each squat for more time under tension.',
+          'Use a thicker band or add a second band for increased resistance.',
+        ],
       },
       {
         id: 'rdl',
@@ -87,6 +176,20 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Stand on the band, hinge at hips with soft knees. Lower hands along shins until hamstring stretch, then squeeze glutes to return upright.',
+        muscles: { primary: ['hamstrings', 'glutes'], secondary: ['back', 'core'] },
+        formTips: [
+          'Hinge at the hips by pushing your butt back, not by bending your knees.',
+          'Keep the band handles close to your legs throughout the movement.',
+          'Feel a deep stretch in the hamstrings before driving the hips forward.',
+        ],
+        commonMistakes: [
+          'Rounding the back during the lowering phase, risking lower back strain.',
+          'Bending the knees too much, turning the RDL into a conventional deadlift.',
+        ],
+        progressionTips: [
+          'Perform single-leg RDLs to increase balance demands and unilateral strength.',
+          'Slow the lowering phase to 4 seconds for greater hamstring activation.',
+        ],
       },
       {
         id: 'lateral_walks',
@@ -95,6 +198,21 @@ const WORKOUT_SCHEDULE = {
         reps: '20',
         rest: 60,
         description: 'Place mini band above knees. Assume quarter-squat position. Step laterally maintaining tension. 10 steps each direction per set.',
+        muscles: { primary: ['glutes'], secondary: ['quads', 'core'] },
+        formTips: [
+          'Stay low in a quarter-squat position throughout the entire set.',
+          'Take controlled steps, keeping constant tension on the band.',
+          'Keep your feet parallel and avoid turning your toes outward.',
+        ],
+        commonMistakes: [
+          'Standing too upright and losing the athletic quarter-squat position.',
+          'Dragging the trailing foot instead of taking deliberate steps.',
+          'Letting the knees collapse inward, reducing glute engagement.',
+        ],
+        progressionTips: [
+          'Add an extra mini band around the ankles for increased resistance.',
+          'Increase to 15 steps each direction per set for more volume.',
+        ],
       },
       {
         id: 'glute_bridges',
@@ -103,6 +221,20 @@ const WORKOUT_SCHEDULE = {
         reps: '15',
         rest: 60,
         description: 'Lie on back with band above knees, feet flat. Drive hips up squeezing glutes at top. Push knees out against band throughout the movement.',
+        muscles: { primary: ['glutes'], secondary: ['hamstrings', 'core'] },
+        formTips: [
+          'Drive through your heels and squeeze your glutes hard at the top.',
+          'Push your knees outward against the band throughout the entire rep.',
+          'Keep your ribs down and avoid hyperextending your lower back.',
+        ],
+        commonMistakes: [
+          'Pushing through the toes instead of the heels, overloading the quads.',
+          'Not fully extending the hips at the top and missing peak contraction.',
+        ],
+        progressionTips: [
+          'Try single-leg glute bridges to double the load on each side.',
+          'Add a 3-second hold at the top of each rep for glute endurance.',
+        ],
       },
       {
         id: 'calf_raises',
@@ -111,6 +243,20 @@ const WORKOUT_SCHEDULE = {
         reps: '20',
         rest: 30,
         description: 'Stand on band with balls of feet, hold ends at sides. Rise up on toes with full range of motion. Pause at top, lower slowly.',
+        muscles: { primary: ['calves'], secondary: ['core'] },
+        formTips: [
+          'Rise as high as possible on your toes for full calf contraction.',
+          'Lower slowly over 2-3 seconds for eccentric muscle loading.',
+          'Keep your knees straight but not locked to isolate the calves.',
+        ],
+        commonMistakes: [
+          'Bouncing at the bottom instead of using a controlled range of motion.',
+          'Leaning forward and shifting weight off the calves.',
+        ],
+        progressionTips: [
+          'Perform single-leg calf raises to increase difficulty and address imbalances.',
+          'Add a 2-second pause at the top of each rep for a stronger contraction.',
+        ],
       },
     ],
   },
@@ -126,6 +272,21 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Anchor band at chest height. Pull handles to ribcage, squeezing shoulder blades together. Keep elbows close to body and chest lifted.',
+        muscles: { primary: ['back', 'lats'], secondary: ['biceps', 'shoulders'] },
+        formTips: [
+          'Squeeze your shoulder blades together at the end of each pull.',
+          'Keep your elbows close to your body, pulling to your lower ribcage.',
+          'Maintain an upright chest and avoid rounding your shoulders forward.',
+        ],
+        commonMistakes: [
+          'Using momentum by leaning back instead of pulling with the back muscles.',
+          'Not fully retracting the shoulder blades, reducing back engagement.',
+          'Shrugging the shoulders up toward the ears during the pull.',
+        ],
+        progressionTips: [
+          'Add a 2-second squeeze at peak contraction for stronger back activation.',
+          'Step further from the anchor to increase band tension throughout the rep.',
+        ],
       },
       {
         id: 'face_pulls',
@@ -134,6 +295,20 @@ const WORKOUT_SCHEDULE = {
         reps: '15',
         rest: 60,
         description: 'Anchor band at face height. Pull to face level with elbows high, externally rotate at end position. Focus on rear delts and upper back.',
+        muscles: { primary: ['shoulders', 'traps'], secondary: ['back'] },
+        formTips: [
+          'Pull the band to face level with your elbows high and wide.',
+          'Externally rotate your hands at the end position so thumbs point back.',
+          'Focus on squeezing the rear delts and upper back, not the arms.',
+        ],
+        commonMistakes: [
+          'Pulling too low, turning the face pull into a row movement.',
+          'Not externally rotating at the end, missing rear delt activation.',
+        ],
+        progressionTips: [
+          'Hold the end position for 3 seconds to build rear delt endurance.',
+          'Increase reps to 20 before moving to a heavier band.',
+        ],
       },
       {
         id: 'bicep_curls',
@@ -142,6 +317,21 @@ const WORKOUT_SCHEDULE = {
         reps: '12',
         rest: 60,
         description: 'Stand on band, curl handles up with palms forward. Keep elbows pinned to sides. Squeeze at the top and lower with a 3-second negative.',
+        muscles: { primary: ['biceps'], secondary: ['shoulders'] },
+        formTips: [
+          'Pin your elbows to your sides and do not let them drift forward.',
+          'Squeeze your biceps hard at the top of each curl.',
+          'Lower the band with a slow 3-second negative for maximum tension.',
+        ],
+        commonMistakes: [
+          'Swinging the body to generate momentum instead of isolating the biceps.',
+          'Moving the elbows forward, turning it into a front raise.',
+          'Dropping the weight quickly instead of controlling the lowering phase.',
+        ],
+        progressionTips: [
+          'Add a 1-second isometric hold at the top of every rep.',
+          'Try alternating arms to increase focus on each bicep individually.',
+        ],
       },
       {
         id: 'pull_aparts',
@@ -150,6 +340,20 @@ const WORKOUT_SCHEDULE = {
         reps: '15',
         rest: 30,
         description: 'Hold band in front at shoulder height with straight arms. Pull apart until band touches chest. Squeeze shoulder blades. Return slowly.',
+        muscles: { primary: ['back', 'shoulders'], secondary: ['traps'] },
+        formTips: [
+          'Keep your arms straight with only a very slight bend in the elbows.',
+          'Pull the band apart by squeezing your shoulder blades together.',
+          'Return to the start slowly to maintain constant tension on the muscles.',
+        ],
+        commonMistakes: [
+          'Bending the elbows too much and turning it into a rowing motion.',
+          'Shrugging the shoulders upward instead of pulling them back and down.',
+        ],
+        progressionTips: [
+          'Use a shorter grip on the band to increase the resistance.',
+          'Add a 2-second hold when the band touches your chest on each rep.',
+        ],
       },
       {
         id: 'dead_bugs',
@@ -158,6 +362,20 @@ const WORKOUT_SCHEDULE = {
         reps: '10',
         rest: 60,
         description: 'Lie on back with band around feet and hands. Extend opposite arm and leg while maintaining contact between lower back and floor. Alternate sides.',
+        muscles: { primary: ['core'], secondary: ['shoulders', 'quads'] },
+        formTips: [
+          'Press your lower back firmly into the floor throughout every rep.',
+          'Move slowly and deliberately — extend opposite arm and leg in sync.',
+          'Exhale as you extend and inhale as you return to the starting position.',
+        ],
+        commonMistakes: [
+          'Allowing the lower back to arch off the floor during extensions.',
+          'Moving too fast and using momentum instead of controlled core engagement.',
+        ],
+        progressionTips: [
+          'Increase the hold time at full extension to 3 seconds per side.',
+          'Use a heavier band for greater anti-extension challenge on the core.',
+        ],
       },
     ],
   },

@@ -1,9 +1,20 @@
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import Sidebar from './Sidebar';
+import useNotifications from '../hooks/useNotifications';
+import { useApp } from '../context/AppContext';
 
 export default function AppShell({ children }) {
   const location = useLocation();
+  const { state } = useApp();
+  const { scheduleReminders } = useNotifications();
+
+  useEffect(() => {
+    if (state.settings.notifications) {
+      scheduleReminders(state.settings.reminders);
+    }
+  }, [state.settings.notifications, state.settings.reminders, scheduleReminders]);
 
   return (
     <div className="min-h-screen bg-base text-white relative">
@@ -39,7 +50,7 @@ export default function AppShell({ children }) {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="relative z-10 md:ml-64 pb-24 md:pb-8 min-h-screen">
+      <main className="relative z-10 md:ml-64 pb-32 md:pb-8 min-h-screen">
         <div key={location.pathname} className="page-enter px-5 pt-6 md:px-8 md:pt-8 max-w-3xl mx-auto">
           {children}
         </div>

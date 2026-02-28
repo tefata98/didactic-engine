@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Bell, Palette, Volume2, RefreshCw, Fingerprint, WifiOff,
   Moon, Dumbbell, Mic, DollarSign, BookOpen, Download,
-  Upload, Trash2, Info, ChevronRight, Shield, Clock, AlertTriangle
+  Upload, Trash2, Info, ChevronRight, Shield, Clock, AlertTriangle, Zap
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import GlassCard from '../components/GlassCard';
@@ -40,6 +40,15 @@ export default function SettingsPage() {
   const { state, dispatch } = useApp();
   const { settings } = state;
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState(
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+  );
+
+  const handleRequestNotificationPermission = async () => {
+    if (typeof Notification === 'undefined') return;
+    const result = await Notification.requestPermission();
+    setNotificationPermission(result);
+  };
 
   const updateSetting = (key, value) => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: { [key]: value } });
@@ -51,7 +60,7 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `lifeos-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `light-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -90,8 +99,24 @@ export default function SettingsPage() {
 
       {/* General */}
       <SettingSection title="General">
-        <SettingRow icon={Bell} label="Push Notifications" description="Get reminders and alerts">
-          <Toggle enabled={settings.notifications} onChange={(v) => updateSetting('notifications', v)} />
+        <SettingRow icon={Bell} label="Push Notifications" description={
+          notificationPermission === 'granted' ? 'Permission granted' :
+          notificationPermission === 'denied' ? 'Blocked in browser settings' :
+          'Get reminders and alerts'
+        }>
+          <div className="flex items-center gap-2">
+            {notificationPermission === 'default' && settings.notifications && (
+              <button onClick={handleRequestNotificationPermission} className="text-xs text-indigo-400">
+                Allow
+              </button>
+            )}
+            <Toggle enabled={settings.notifications} onChange={(v) => {
+              updateSetting('notifications', v);
+              if (v && notificationPermission === 'default') {
+                handleRequestNotificationPermission();
+              }
+            }} />
+          </div>
         </SettingRow>
         <SettingRow icon={Palette} label="Dark Mode" description="Always on">
           <Toggle enabled={settings.darkMode} onChange={(v) => updateSetting('darkMode', v)} />
@@ -148,6 +173,21 @@ export default function SettingsPage() {
         </SettingRow>
       </SettingSection>
 
+      {/* AI Integration */}
+      <SettingSection title="AI Integration">
+        <SettingRow icon={Zap} label="Anthropic API Key" description={settings.anthropicApiKey ? 'Key is set' : 'Required for AI news'}>
+          <div className="flex items-center gap-2">
+            <input
+              type="password"
+              value={settings.anthropicApiKey || ''}
+              onChange={(e) => updateSetting('anthropicApiKey', e.target.value)}
+              placeholder="sk-ant-..."
+              className="w-36 px-2 py-1.5 rounded-lg text-xs text-white bg-white/5 border border-white/10 outline-none focus:border-indigo-500/50"
+            />
+          </div>
+        </SettingRow>
+      </SettingSection>
+
       {/* Install App */}
       <button
         className="w-full py-4 rounded-glass font-heading font-semibold text-white flex items-center justify-center gap-2 mb-4"
@@ -193,7 +233,7 @@ export default function SettingsPage() {
 
       {/* Version */}
       <div className="text-center py-6">
-        <p className="text-xs text-white/30">LifeOS v2.0.0</p>
+        <p className="text-xs text-white/30">Light v2.0.0</p>
         <p className="text-xs text-white/20 mt-1">Made with care for Stefan</p>
       </div>
     </div>

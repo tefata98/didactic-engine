@@ -120,6 +120,24 @@ export const slsExerciseCategories = [
         commonMistakes: 'Flipping to disconnected falsetto. Using too much force on the bottom note. Not keeping the EE vowel consistent.',
         rockApplication: 'Builds the athletic flexibility needed for rock vocal acrobatics and octave-jumping riffs.',
       },
+      {
+        name: '"Wah" — Open Throat Power',
+        purpose: 'Opens the throat and engages the mix voice with a powerful, open vowel. The W provides a gentle cord onset while AH opens the resonance space.',
+        pattern: '1-3-5-8-5-3-1 ascending by half steps',
+        howTo: 'Say "WAH" like a wah-wah guitar pedal — open and expressive. The W consonant gently brings the cords together, while the AH vowel opens the throat wide. As you ascend through the bridge, allow the AH to narrow slightly toward UH. Keep the jaw relaxed and dropped. Think of the sound bouncing off the back wall of your throat.',
+        sethRiggsQuote: '"WAH opens the door that NAY unlocked. Once you find mix with NAY, WAH teaches you to keep it open and powerful."',
+        commonMistakes: 'Clamping the jaw shut. Not allowing vowel modification on higher notes. Pushing air instead of letting resonance do the work. Losing the W onset and just singing AH.',
+        rockApplication: 'The WAH exercise builds the open, powerful tone needed for sustained rock belting. Think of the soaring chorus notes in Phoenix power ballads — that open, ringing quality comes from this exercise.',
+      },
+      {
+        name: '"Bratty NAY" — Bridge Blaster',
+        purpose: 'An intensified version of the NAY exercise specifically targeting the passaggio. Maximum pharyngeal engagement to blast through bridge resistance.',
+        pattern: '1-3-5-8-5-3-1 ascending by half steps, starting from 3 notes below first bridge',
+        howTo: 'Take the NAY exercise and make it even brattier — think angry cartoon character. Exaggerate the nasality to the point of absurdity. Start 3 notes below your first bridge and ascend through it. The extreme twang forces the thyroid cartilage to tilt, thinning the cords and finding mix voice. Do NOT back off the bratty quality as you ascend — that is where the magic happens.',
+        sethRiggsQuote: '"The bridge is where most singers give up. Bratty NAY is your bulldozer. You don\'t go around the wall — you go through it."',
+        commonMistakes: 'Chickening out on the bratty quality above the bridge. Pulling chest voice up instead of allowing the cord thinning. Backing off volume through the bridge. Not starting low enough to build momentum.',
+        rockApplication: 'This is the exercise that builds the high belt for rock climaxes. When Phoenix hits that final chorus up a key, bratty NAY training is what makes it possible without shredding your voice.',
+      },
     ],
   },
   {
@@ -152,6 +170,15 @@ export const slsExerciseCategories = [
         sethRiggsQuote: '"Head voice is not falsetto. Falsetto is disconnected air. Head voice is connected, thin, and powerful."',
         commonMistakes: 'Using falsetto instead of connected head voice. Making it too heavy. Losing the ring and brightness.',
         rockApplication: 'Critical for extended rock vocals and saving your voice during long sets. Head voice harmonies add texture to Phoenix arrangements.',
+      },
+      {
+        name: '"Hoot" — Pure Head Voice Connection',
+        purpose: 'Isolates and strengthens head voice with a hooty, owl-like quality. Trains the cricothyroid muscle for pitch control in the upper register.',
+        pattern: '8-5-3-1 descending, then 1-3-5-8 ascending by half steps',
+        howTo: 'Say "HOOT" like a soft owl call — round, hooty, and pure. Start in your head voice range and descend, maintaining the light, connected quality all the way down. Then reverse, ascending from chest into head voice. The OO vowel naturally thins the cords. Keep it breathy-free — you should feel cord connection even though the sound is light.',
+        sethRiggsQuote: '"The hoot finds your head voice without the strain. It\'s the opposite of belting — and equally important."',
+        commonMistakes: 'Adding breathiness (that is falsetto, not head voice). Making it too loud. Losing cord connection on the descent. Tensing the tongue on the OO vowel.',
+        rockApplication: 'Builds the upper register strength needed for rock harmonies and falsetto-to-head-voice transitions. Phoenix layered vocals in the studio benefit from strong head voice.',
       },
     ],
   },
@@ -250,6 +277,38 @@ export const breathingExercises = [
     ],
     sethRiggsQuote: '"The audience should never hear you breathe. Quick, silent breath management separates professionals from amateurs."',
   },
+  {
+    name: 'Box Breathing for Stage Nerves',
+    duration: '4 min',
+    level: 'All Levels',
+    steps: [
+      'Sit or stand comfortably. Close your eyes if possible.',
+      'Inhale through nose for 4 counts — slow and steady.',
+      'Hold your breath for 4 counts — stay relaxed, no tension.',
+      'Exhale through mouth for 4 counts — controlled and even.',
+      'Hold empty for 4 counts — resist the urge to gasp.',
+      'Repeat the 4-4-4-4 cycle 6-8 times.',
+      'Notice your heart rate dropping and nerves calming.',
+      'Use this backstage before every Phoenix gig.',
+    ],
+    sethRiggsQuote: '"A nervous singer is a tight singer. Box breathing resets your nervous system so your voice can do what it knows how to do."',
+  },
+  {
+    name: 'Rib Expansion Drill',
+    duration: '3 min',
+    level: 'Intermediate',
+    steps: [
+      'Place your hands on your lower ribs, fingers pointing forward.',
+      'Breathe in slowly through the nose — focus on expanding the ribs LATERALLY (sideways).',
+      'Feel your hands being pushed apart as the ribs expand outward.',
+      'Your shoulders should NOT rise. Your belly expands, but focus on the lateral rib movement.',
+      'Hold the expanded position for 2 counts.',
+      'Exhale slowly on SSS, maintaining the rib expansion as long as possible.',
+      'The goal: keep the ribs expanded even while exhaling — this is the appoggio "lean".',
+      'Repeat 10 times. This builds intercostal muscle awareness and breath support.',
+    ],
+    sethRiggsQuote: '"The ribs are your bellows. When you learn to control them independently, you unlock a new level of breath support."',
+  },
 ];
 
 export const theoryLessons = [
@@ -334,3 +393,19 @@ export const sethRiggsBio = {
   book: 'Singing for the Stars',
   famousStudents: ['Michael Jackson', 'Stevie Wonder', 'Prince', 'Ray Charles', 'Natalie Cole', 'Luther Vandross'],
 };
+
+export const vocalHealthTips = [
+  { title: 'Hydration Protocol', description: 'Drink room temperature water throughout the day. The vocal folds need to stay hydrated to vibrate efficiently. Aim for 2-3 liters daily. Avoid ice water before singing.', icon: 'droplet' },
+  { title: 'Foods to Avoid Before Singing', description: 'Dairy coats the throat with mucus. Caffeine dehydrates vocal folds. Alcohol numbs the throat leading to overuse. Spicy food causes reflux. Avoid these 2-3 hours before singing.', icon: 'ban' },
+  { title: 'Recognizing Vocal Fatigue', description: 'Warning signs: loss of high notes, breathy or raspy tone, throat tightness, voice cracking, needing more effort to project. Stop singing immediately if you experience these.', icon: 'alert' },
+  { title: 'When to See a Laryngologist', description: 'If hoarseness persists for more than 2 weeks, if you experience pain while singing, if your speaking voice changes, or if you notice blood when coughing. Early intervention prevents serious damage.', icon: 'stethoscope' },
+  { title: 'Vocal Rest Days', description: 'After heavy gigs or extended rehearsals, give your voice 24-48 hours of vocal rest. This means minimal speaking, no singing, and staying well hydrated. Your vocal folds need recovery time.', icon: 'moon' },
+  { title: 'Warm-Up Is Non-Negotiable', description: 'Never sing cold. Even 5 minutes of gentle lip trills and sirens prepare your vocal folds. Cold singing risks vocal hemorrhage, nodules, and chronic strain. Seth Riggs emphasizes this above all else.', icon: 'flame' },
+  { title: 'Steam Inhalation', description: 'Inhale steam for 10-15 minutes before intensive singing sessions. This directly hydrates the vocal fold surface. A personal steamer or hot shower works well. Add no essential oils.', icon: 'wind' },
+];
+
+export const dailyRoutines = [
+  { id: 'quick5', name: '5-Minute Quick Warm-Up', duration: '5 min', exercises: ['Lip Trills', 'Tongue Trills', 'Sirens'], description: 'Perfect for days when you have limited time but still want to maintain vocal health.' },
+  { id: 'standard15', name: '15-Minute SLS Session', duration: '15 min', exercises: ['Lip Trills', 'Lip Trills with Scales', 'MUM Exercise', 'NAY Exercise', 'Cool Down'], description: 'The daily maintenance routine recommended by Seth Riggs for working vocalists.' },
+  { id: 'full25', name: '25-Minute Full Practice', duration: '25 min', exercises: ['Diaphragmatic Breathing', 'Lip Trills', 'Tongue Trills', 'Sirens', 'MUM Exercise', 'NAY Exercise', 'GEE Exercise', 'Song Application', 'Cool Down Sirens'], description: 'Complete SLS practice covering all registers. Ideal for days before rehearsal or performance.' },
+];
