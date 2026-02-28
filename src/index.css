@@ -30,6 +30,12 @@ body {
 }
 
 /* Safe area for notched phones */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .bottom-nav-safe {
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
